@@ -28,6 +28,36 @@ header nav a {
     font-style: bold;
 }
 
+/* HEADER PROFILE WIDGET (shared) */
+.header-profile {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    color: inherit;
+}
+
+.header-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #D40511;
+    color: #fff;
+    font-weight: bold;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.header-username {
+    font-weight: bold;
+    font-size: 14px;
+    color: #000;
+    white-space: nowrap;
+}
+
 /* HERO SECTION */
 .hero {
     background: url('https://via.placeholder.com/1600x450') center/cover no-repeat;

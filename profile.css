@@ -15,31 +15,6 @@
     --transition:  0.25s ease;
 }
 
-/* ---------- Header extra ---------- */
-.header-profile {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.header-avatar {
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    background: var(--dhl-red);
-    color: #fff;
-    font-weight: bold;
-    font-size: 13px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.header-username {
-    font-weight: bold;
-    font-size: 14px;
-}
-
 /* ══════════════════════════════════════════════
    PROFILE HERO
    ══════════════════════════════════════════════ */
