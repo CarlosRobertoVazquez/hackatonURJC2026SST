@@ -111,3 +111,20 @@ header nav a {
 .news-section h2 {
     margin-bottom: 10px;
 }
+/* Botón reutilizable */
+.btn {
+    display: inline-block;
+    background: #d40511;
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-size: 16px;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    transition:.2s ease;
+}
+
+.btn:hover {
+    background: #b1040e;
+}

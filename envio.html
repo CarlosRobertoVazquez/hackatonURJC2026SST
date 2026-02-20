@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Detalle de envío</title>
+    <link rel="stylesheet" href="styles-envio.css" />
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
+
+    <style>
+        /* Estilos específicos de esta vista */
+        .container {
+            max-width: 960px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .shipment-card {
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, .08);
+            padding: 24px;
+            display: grid;
+            gap: 16px;
+        }
+
+        .shipment-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px 16px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 6px 10px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: .3px;
+            background: #ffe680;
+            color: #7a5a00;
+        }
+
+        .row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+
+        .field {
+            background: #fafafa;
+            border-radius: 8px;
+            padding: 12px 14px;
+        }
+
+        .field label {
+            font-size: 12px;
+            color: #666;
+            display: block;
+            margin-bottom: 6px;
+        }
+
+        .field div {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .actions {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 6px;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid #d40511;
+            color: #d40511;
+            padding: 10px 18px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all .2s ease;
+        }
+
+        .btn-outline:hover {
+            background: #ffd6d8;
+        }
+
+        .note {
+            font-size: 13px;
+            color: #444;
+            background: #fff9d6;
+            border: 1px solid #ffe58f;
+            padding: 10px 12px;
+            border-radius: 6px;
+        }
+
+
+        @media (max-width: 720px) {
+            .row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <div><strong class="logo">HackatonDHL</strong></div>
+        <nav>
+            <a href="index.html">Haga seguimiento</a>
+            <a href="#">Enviar</a>
+            <a href="#">Servicios de logística</a>
+            <a href="#">Servicio al cliente</a>
+        </nav>
+    </header>
+
+    <main class="container">
+        <h1 style="margin: 10px 0 18px;">Detalle del envío</h1>
+        <h2 style="margin-top:40px;">Ubicación del envío</h2>
+        <div id="map"></div>
+
+        <section class="shipment-card" id="card">
+            <div class="shipment-header">
+                <div>
+                    <div style="font-size:18px; font-weight:800;">Envío #1234 5678 90</div>
+                    <span class="badge" id="badge-servicio">Servicio: Estándar</span>
+                </div>
+                <div class="actions">
+                    <button class="btn-outline" id="btn-eco">Cambiar a EnvíoEco</button>
+                    <a class="btn" href="index.html">Volver</a>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="field">
+                    <label>Estado</label>
+                    <div id="estado">En tránsito</div>
+                </div>
+                <div class="field">
+                    <label>Entrega estimada</label>
+                    <div>Martes 25 de febrero, 12:00–16:00</div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="field">
+                    <label>Origen</label>
+                    <div>Madrid, ES</div>
+                </div>
+                <div class="field">
+                    <label>Destino</label>
+                    <div>Barcelona, ES</div>
+                </div>
+            </div>
+
+            <p class="note" id="nota">
+                Este envío usa el servicio Estándar. Puedes cambiar a <strong>EnvíoEco</strong> para reducir tu huella
+                de carbono.
+            </p>
+        </section>
+        <section class="impact-section" aria-labelledby="impact-title">
+            <h2 id="impact-title">Impacto ambiental del envío</h2>
+
+            <div class="impact-summary">
+                <div class="impact-item">
+                    <span class="label">Emisiones estimadas</span>
+                    <span class="value"><span id="co2-value">4.8</span> kg CO₂e</span>
+                </div>
+                <div class="impact-item">
+                    <span class="label">Ahorro con EnvíoEco</span>
+                    <span class="value saving">hasta <span id="saving-percent">40</span>%</span>
+                </div>
+            </div>
+
+            <!-- Barra de progreso accesible -->
+            <div class="impact-bar" role="progressbar" aria-valuemin="0" aria-valuemax="10" aria-valuenow="4.8"
+                aria-label="Emisiones de CO2 del envío">
+                <div class="impact-bar__fill" id="impact-fill" style="width: 48%"></div>
+            </div>
+
+            <p class="impact-note" id="impact-note">
+                Este envío usa el servicio <strong>Estándar</strong>. Cambia a <strong>EnvíoEco</strong> para reducir
+                las emisiones de CO₂e.
+            </p>
+        </section>
+    </main>
+
+    <script>
+        // Simula el cambio a EnvíoEco en la vista
+        const btnEcoImpacto = document.getElementById('btn-eco');
+        const badge = document.getElementById('badge-servicio');
+        const nota = document.getElementById('nota');
+        const estadoEl = document.getElementById('estado');
+
+        btnEco.addEventListener('click', () => {
+            badge.textContent = 'Servicio: EnvíoEco';
+            badge.style.background = '#d9f7be';
+            badge.style.color = '#135200';
+            nota.innerHTML = 'Has cambiado a <strong>EnvíoEco</strong>. Gracias por elegir una opción más sostenible.';
+            estadoEl.textContent = 'En tránsito (modo ecológico)';
+            btnEco.disabled = true;
+            btnEco.textContent = 'EnvíoEco activado';
+            btnEco.style.opacity = .7;
+            btnEco.style.cursor = 'default';
+        });
+    </script>
+
+</body>
+
+</html>
+<script>
+    // Coordenadas de ejemplo (Madrid)
+    const lat = 40.4168;
+    const lng = -3.7038;
+
+    // Crear mapa
+    const map = L.map('map').setView([lat, lng], 12);
+
+    // Cargar mapa base
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '© OpenStreetMap'
+    }).addTo(map);
+
+    // Marcador
+    L.marker([lat, lng])
+        .addTo(map)
+        .bindPopup("Ubicación aproximada del envío.")
+        .openPopup();
+
+  // ====== Configuración de la barra de impacto ======
+  // Rango máximo visible en la barra (kg CO2e)
+  const CO2_MAX = 10;
+
+  // Valores iniciales (puedes sustituir por datos reales)
+  let co2Actual = 4.8;   // kg CO2e en modo Estándar
+  const ahorroPorc = 40; // % ahorro al pasar a ECO
+
+  // Elementos del DOM
+  const bar        = document.querySelector('.impact-bar');
+  const barFill    = document.getElementById('impact-fill');
+  const co2ValueEl = document.getElementById('co2-value');
+  const savingEl   = document.getElementById('saving-percent');
+  const noteEl     = document.getElementById('impact-note');
+  const btnEco     = document.getElementById('btn-eco');
+
+  // Inicializa textos
+  savingEl.textContent = ahorroPorc.toString();
+
+  // Función para animar número (ej. 4.8 -> 2.9)
+  function animateNumber(el, from, to, duration = 600) {
+    const start = performance.now();
+    function tick(now) {
+      const p = Math.min(1, (now - start) / duration);
+      const value = from + (to - from) * p;
+      el.textContent = value.toFixed(1);
+      if (p < 1) requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  }
+
+  // Función para actualizar barra y accesibilidad
+  function updateBar(valueKg) {
+    const pct = Math.max(0, Math.min(100, (valueKg / CO2_MAX) * 100));
+    barFill.style.width = pct + '%';
+    bar.setAttribute('aria-valuenow', valueKg.toFixed(1));
+  }
+
+  // Estado inicial
+  co2ValueEl.textContent = co2Actual.toFixed(1);
+  updateBar(co2Actual);
+
+  // Al pulsar "Cambiar a EnvíoEco"
+  if (btnEco) {
+    btnEco.addEventListener('click', () => {
+      // Evita disparos múltiples
+      if (btnEco.disabled) return;
+
+      const nuevoValor = +(co2Actual * (1 - ahorroPorc / 100)).toFixed(1);
+
+      // Cambia aspecto de la barra a ECO
+      bar.classList.add('eco');
+
+      // Anima valor numérico y la barra
+      animateNumber(co2ValueEl, co2Actual, nuevoValor, 700);
+      updateBar(nuevoValor);
+
+      // Mensaje
+      noteEl.innerHTML = 'Has activado <strong>EnvíoEco</strong>. Emisiones reducidas aproximadamente un '
+        + ahorroPorc + '%.';
+
+      // Deshabilita botón y refleja estado
+      btnEco.disabled = true;
+      btnEco.textContent = 'EnvíoEco activado';
+      btnEco.style.opacity = .7;
+      btnEco.style.cursor = 'default';
+
+      // Si usas el badge de servicio del ejemplo anterior, también lo actualizamos si existe
+      const badge = document.getElementById('badge-servicio');
+      if (badge) {
+        badge.textContent = 'Servicio: EnvíoEco';
+        badge.style.background = '#d9f7be';
+        badge.style.color = '#135200';
+      }
+    });
+  }
+</script>
