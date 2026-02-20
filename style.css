@@ -1,0 +1,113 @@
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f7f7f7;
+}
+
+/* HEADER */
+header {
+    background: #ffcc00;
+    padding: 10px 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+header nav a {
+    margin: 0 15px;
+    text-decoration: none;
+    color: #000;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.logo {
+    font-size: 20px;
+    color: #D40511;
+    font-style: italic;
+    font-style: bold;
+}
+
+/* HERO SECTION */
+.hero {
+    background: url('https://via.placeholder.com/1600x450') center/cover no-repeat;
+    padding: 80px 0;
+    text-align: center;
+    color: #fff;
+    position: relative;
+}
+
+.hero h1 {
+    font-size: 32px;
+    margin-bottom: 20px;
+    text-shadow: 0 0 5px #000;
+}
+
+.track-box {
+    background: #fff;
+    padding: 15px;
+    width: 60%;
+    margin: auto;
+    border-radius: 6px;
+    display: flex;
+    gap: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.track-box input {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+.track-box button {
+    background: #d40511;
+    border: none;
+    padding: 0 20px;
+    border-radius: 5px;
+    color: #fff;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+/* CARD SECTION */
+.card-section {
+    display: flex;
+    justify-content: center;
+    margin-top: -40px;
+    position: relative;
+    z-index: 10;
+    gap: 20px;
+}
+
+.card {
+    background: #fff;
+    width: 260px;
+    padding: 25px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.card h3 {
+    margin-bottom: 10px;
+}
+
+.card p {
+    font-size: 14px;
+    color: #444;
+}
+
+/* NEWS SECTION */
+.news-section {
+    margin-top: 80px;
+    padding: 40px;
+    background: #ffe680;
+    text-align: center;
+}
+
+.news-section h2 {
+    margin-bottom: 10px;
+}
