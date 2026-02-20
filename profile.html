@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Perfil EcoPoints – DHL</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="profile.css">
+</head>
+
+<body>
+
+<!-- ══════════════ HEADER ══════════════ -->
+<header>
+    <div><a href="index.html" style="text-decoration:none;"><strong class="logo">HackatonDHL</strong></a></div>
+    <nav>
+        <a href="#">Haga seguimiento</a>
+        <a href="#">Enviar</a>
+        <a href="#">Servicios de logística</a>
+        <a href="#">Servicio al cliente</a>
+    </nav>
+    <div class="header-profile">
+        <span class="header-avatar">CM</span>
+        <span class="header-username">Carlos M.</span>
+    </div>
+</header>
+
+<!-- ══════════════ PROFILE HERO ══════════════ -->
+<section class="profile-hero">
+    <div class="profile-hero-inner">
+
+        <!-- Avatar & Info -->
+        <div class="profile-identity">
+            <div class="avatar">CM</div>
+            <div class="profile-info">
+                <h1 class="profile-name">Carlos Martínez</h1>
+                <p class="profile-email">carlos.martinez@email.com</p>
+                <div class="badge-row">
+                    <span class="eco-badge">🌿 Enviador Eco</span>
+                    <span class="level-badge">Nivel Plata</span>
+                </div>
+                <p class="member-since">Miembro desde enero 2024</p>
+            </div>
+        </div>
+
+        <!-- EcoPoints Big Display -->
+        <div class="ecopoints-display">
+            <div class="ecopoints-label">MIS ECOPOINTS</div>
+            <div class="ecopoints-value">
+                <span class="leaf-icon">🍃</span>
+                <span class="points-number">2 340</span>
+            </div>
+            <div class="progress-section">
+                <div class="progress-legend">
+                    <span>Nivel Plata</span>
+                    <span>Nivel Oro (3 000 pts)</span>
+                </div>
+                <div class="progress-bar-track">
+                    <div class="progress-bar-fill" style="width: 78%;">
+                        <span class="progress-label">78%</span>
+                    </div>
+                </div>
+                <p class="progress-hint">¡Te faltan <strong>660 pts</strong> para alcanzar el Nivel Oro!</p>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+<!-- ══════════════ STATS ROW ══════════════ -->
+<section class="stats-row">
+    <div class="stat-card">
+        <div class="stat-icon">🌍</div>
+        <div class="stat-value">18,4 kg</div>
+        <div class="stat-label">CO₂ ahorrado</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon">📦</div>
+        <div class="stat-value">23</div>
+        <div class="stat-label">Paquetes agrupados</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon">🚚</div>
+        <div class="stat-value">7</div>
+        <div class="stat-label">Rutas optimizadas</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon">⭐</div>
+        <div class="stat-value">2 340</div>
+        <div class="stat-label">EcoPoints totales</div>
+    </div>
+</section>
+
+<!-- ══════════════ HOW IT WORKS BANNER ══════════════ -->
+<div class="how-it-works-banner">
+    <span class="hiw-icon">💡</span>
+    <p><strong>¿Cómo funciono los EcoPoints?</strong>  Cuando eliges la opción <em>Entrega Eco</em> al realizar un pedido, DHL agrupa tu paquete con otros envíos cercanos. Menos viajes = menos CO₂. Tú eliges el retraso y ganas puntos por cada entrega sostenible que canjeás por recompensas.</p>
+</div>
+
+<!-- ══════════════ REWARDS CATALOG ══════════════ -->
+<section class="rewards-section">
+    <h2 class="section-title">🎁 Canjea tus EcoPoints</h2>
+    <p class="section-subtitle">Usa los puntos que has ganado siendo sostenible</p>
+
+    <div class="rewards-grid">
+
+        <!-- Reward 1 — Free shipping -->
+        <div class="reward-card reward-available">
+            <div class="reward-ribbon">Disponible</div>
+            <div class="reward-icon">🚚</div>
+            <h3 class="reward-title">Envío Gratis</h3>
+            <p class="reward-desc">Un envío nacional estándar completamente gratuito para tu próximo pedido.</p>
+            <div class="reward-cost">
+                <span class="cost-number">500</span>
+                <span class="cost-unit">pts</span>
+            </div>
+            <button class="btn-redeem" onclick="canjear(this, 'Envío Gratis', 500)">Canjear ahora</button>
+        </div>
+
+        <!-- Reward 2 — Fast shipping -->
+        <div class="reward-card reward-available">
+            <div class="reward-ribbon">Disponible</div>
+            <div class="reward-icon">⚡</div>
+            <h3 class="reward-title">Envío Express</h3>
+            <p class="reward-desc">Upgradea cualquier envío al servicio Express — entrega en 24 h garantizada.</p>
+            <div class="reward-cost">
+                <span class="cost-number">800</span>
+                <span class="cost-unit">pts</span>
+            </div>
+            <button class="btn-redeem" onclick="canjear(this, 'Envío Express', 800)">Canjear ahora</button>
+        </div>
+
+        <!-- Reward 3 — Priority packaging -->
+        <div class="reward-card reward-available">
+            <div class="reward-ribbon">Disponible</div>
+            <div class="reward-icon">📦</div>
+            <h3 class="reward-title">Embalaje Premium</h3>
+            <p class="reward-desc">Embalaje resistente y sostenible (materiales reciclados) para proteger tu envío.</p>
+            <div class="reward-cost">
+                <span class="cost-number">300</span>
+                <span class="cost-unit">pts</span>
+            </div>
+            <button class="btn-redeem" onclick="canjear(this, 'Embalaje Premium', 300)">Canjear ahora</button>
+        </div>
+
+        <!-- Reward 4 — International shipping discount -->
+        <div class="reward-card reward-available">
+            <div class="reward-ribbon">Disponible</div>
+            <div class="reward-icon">🌐</div>
+            <h3 class="reward-title">-20% Envío Internacional</h3>
+            <p class="reward-desc">Descuento del 20% en tu próximo envío internacional a cualquier destino.</p>
+            <div class="reward-cost">
+                <span class="cost-number">1 200</span>
+                <span class="cost-unit">pts</span>
+            </div>
+            <button class="btn-redeem" onclick="canjear(this, '-20% Internacional', 1200)">Canjear ahora</button>
+        </div>
+
+        <!-- Reward 5 — Gold level perk (locked) -->
+        <div class="reward-card reward-locked">
+            <div class="reward-ribbon ribbon-locked">🔒 Nivel Oro</div>
+            <div class="reward-icon dim">🏆</div>
+            <h3 class="reward-title">Envío Internacional Gratis</h3>
+            <p class="reward-desc">Un envío internacional gratis a cualquier destino del mundo. Exclusivo Nivel Oro.</p>
+            <div class="reward-cost">
+                <span class="cost-number">2 500</span>
+                <span class="cost-unit">pts</span>
+            </div>
+            <button class="btn-redeem btn-locked" disabled>Requiere Nivel Oro</button>
+        </div>
+
+        <!-- Reward 6 — Plant a tree -->
+        <div class="reward-card reward-available">
+            <div class="reward-ribbon">Disponible</div>
+            <div class="reward-icon">🌳</div>
+            <h3 class="reward-title">Planta un Árbol</h3>
+            <p class="reward-desc">DHL planta un árbol en tu nombre en colaboración con organizaciones medioambientales.</p>
+            <div class="reward-cost">
+                <span class="cost-number">150</span>
+                <span class="cost-unit">pts</span>
+            </div>
+            <button class="btn-redeem" onclick="canjear(this, 'Planta un Árbol', 150)">Canjear ahora</button>
+        </div>
+
+    </div>
+</section>
+
+<!-- ══════════════ MY REWARDS STATUS ══════════════ -->
+<section class="my-rewards-section">
+    <h2 class="section-title">🎟️ Mis recompensas</h2>
+    <p class="section-subtitle">Recompensas que has canjeado y su estado actual</p>
+
+    <!-- Tab buttons -->
+    <div class="rw-tabs">
+        <button class="rw-tab active" onclick="switchTab('pending', this)">⏳ Pendientes <span class="rw-badge" id="badge-pending">2</span></button>
+        <button class="rw-tab" onclick="switchTab('used', this)">✅ Canjeadas <span class="rw-badge rw-badge-used" id="badge-used">3</span></button>
+    </div>
+
+    <!-- PENDING TAB -->
+    <div class="rw-panel" id="tab-pending">
+        <div class="rw-list" id="pending-list">
+
+            <div class="rw-item rw-item-pending">
+                <div class="rw-item-icon">⚡</div>
+                <div class="rw-item-info">
+                    <span class="rw-item-name">Envío Express</span>
+                    <span class="rw-item-date">Canjeado el 17 feb 2026</span>
+                    <span class="rw-item-desc">Se aplicará automáticamente en tu próximo envío.</span>
+                </div>
+                <div class="rw-item-right">
+                    <span class="rw-status rw-status-pending">Pendiente de uso</span>
+                    <span class="rw-cost">−800 pts</span>
+                </div>
+            </div>
+
+            <div class="rw-item rw-item-pending">
+                <div class="rw-item-icon">🌳</div>
+                <div class="rw-item-info">
+                    <span class="rw-item-name">Planta un Árbol</span>
+                    <span class="rw-item-date">Canjeado el 10 feb 2026</span>
+                    <span class="rw-item-desc">DHL procesará la plantación en los próximos 7 días.</span>
+                </div>
+                <div class="rw-item-right">
+                    <span class="rw-status rw-status-pending">En proceso</span>
+                    <span class="rw-cost">−150 pts</span>
+                </div>
+            </div>
+
+        </div>
+        <p class="rw-empty" id="pending-empty" style="display:none;">No tienes recompensas pendientes.</p>
+    </div>
+
+    <!-- USED TAB -->
+    <div class="rw-panel" id="tab-used" style="display:none;">
+        <div class="rw-list">
+
+            <div class="rw-item rw-item-used">
+                <div class="rw-item-icon">🚚</div>
+                <div class="rw-item-info">
+                    <span class="rw-item-name">Envío Gratis</span>
+                    <span class="rw-item-date">Usado el 05 feb 2026</span>
+                    <span class="rw-item-desc">Aplicado al envío #DHL-00472581 · Madrid → Valencia.</span>
+                </div>
+                <div class="rw-item-right">
+                    <span class="rw-status rw-status-used">Usado</span>
+                    <span class="rw-cost">−500 pts</span>
+                </div>
+            </div>
+
+            <div class="rw-item rw-item-used">
+                <div class="rw-item-icon">📦</div>
+                <div class="rw-item-info">
+                    <span class="rw-item-name">Embalaje Premium</span>
+                    <span class="rw-item-date">Usado el 20 ene 2026</span>
+                    <span class="rw-item-desc">Aplicado al envío #DHL-00461804 · Sevilla → Madrid.</span>
+                </div>
+                <div class="rw-item-right">
+                    <span class="rw-status rw-status-used">Usado</span>
+                    <span class="rw-cost">−300 pts</span>
+                </div>
+            </div>
+
+            <div class="rw-item rw-item-used">
+                <div class="rw-item-icon">🌳</div>
+                <div class="rw-item-info">
+                    <span class="rw-item-name">Planta un Árbol</span>
+                    <span class="rw-item-date">Usado el 08 ene 2026</span>
+                    <span class="rw-item-desc">Árbol plantado en la Sierra de Guadarrama. ¡Gracias!</span>
+                </div>
+                <div class="rw-item-right">
+                    <span class="rw-status rw-status-used">Completado</span>
+                    <span class="rw-cost">−150 pts</span>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</section>
+
+<!-- ══════════════ ECO ACTIVITY HISTORY ══════════════ -->
+<section class="activity-section">
+    <h2 class="section-title">📋 Actividad Eco reciente</h2>
+    <p class="section-subtitle">Historial de entregas sostenibles y puntos ganados</p>
+
+    <div class="activity-table-wrapper">
+        <table class="activity-table">
+            <thead>
+                <tr>
+                    <th>Fecha</th>
+                    <th>Paquete</th>
+                    <th>Retraso elegido</th>
+                    <th>Paquetes agrupados</th>
+                    <th>CO₂ ahorrado</th>
+                    <th>EcoPoints</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>18 feb 2026</td>
+                    <td>📦 #DHL-00481920</td>
+                    <td><span class="delay-chip">3 días</span></td>
+                    <td>5 paquetes</td>
+                    <td class="co2">−1,2 kg CO₂</td>
+                    <td><span class="points-earned">+120 pts</span></td>
+                </tr>
+                <tr>
+                    <td>12 feb 2026</td>
+                    <td>📦 #DHL-00479003</td>
+                    <td><span class="delay-chip">5 días</span></td>
+                    <td>9 paquetes</td>
+                    <td class="co2">−2,1 kg CO₂</td>
+                    <td><span class="points-earned">+200 pts</span></td>
+                </tr>
+                <tr>
+                    <td>03 feb 2026</td>
+                    <td>📦 #DHL-00472581</td>
+                    <td><span class="delay-chip">2 días</span></td>
+                    <td>4 paquetes</td>
+                    <td class="co2">−0,9 kg CO₂</td>
+                    <td><span class="points-earned">+80 pts</span></td>
+                </tr>
+                <tr>
+                    <td>25 ene 2026</td>
+                    <td>📦 #DHL-00465712</td>
+                    <td><span class="delay-chip">7 días</span></td>
+                    <td>12 paquetes</td>
+                    <td class="co2">−3,4 kg CO₂</td>
+                    <td><span class="points-earned">+340 pts</span></td>
+                </tr>
+                <tr>
+                    <td>15 ene 2026</td>
+                    <td>📦 #DHL-00461804</td>
+                    <td><span class="delay-chip">3 días</span></td>
+                    <td>6 paquetes</td>
+                    <td class="co2">−1,5 kg CO₂</td>
+                    <td><span class="points-earned">+150 pts</span></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<!-- ══════════════ PENDING ECO DELIVERY ══════════════ -->
+<section class="pending-section">
+    <h2 class="section-title">⏳ Envío Eco pendiente</h2>
+    <p class="section-subtitle">Has elegido la entrega agrupada para este paquete</p>
+
+    <div class="pending-card">
+        <div class="pending-left">
+            <div class="pending-track">#DHL-00488491</div>
+            <div class="pending-origin">Madrid → Barcelona</div>
+            <div class="pending-delay-info">
+                <span class="delay-chip">Retraso: 5 días</span>
+                <span class="pending-window">Entrega estimada: 25 feb 2026</span>
+            </div>
+        </div>
+        <div class="pending-middle">
+            <div class="batch-progress-label">Paquetes acumulados</div>
+            <div class="batch-bar-track">
+                <div class="batch-bar-fill" style="width: 60%;">6/10</div>
+            </div>
+            <p class="batch-hint">La ruta sale cuando se completen 10 paquetes o se cumpla el plazo.</p>
+        </div>
+        <div class="pending-right">
+            <div class="pending-reward-preview">🍃 Ganarás</div>
+            <div class="pending-points">+200 pts</div>
+            <div class="pending-co2">−2,1 kg CO₂ estimado</div>
+        </div>
+    </div>
+</section>
+
+<!-- ══════════════ FOOTER ══════════════ -->
+<footer class="site-footer">
+    <p>© 2026 DHL Express — <span style="color:#4caf50;">♻ Comprometidos con el planeta</span></p>
+</footer>
+
+<!-- ══════════════ REDEEM TOAST ══════════════ -->
+<div class="toast" id="toast"></div>
+
+<script>
+    let currentPoints = 2340;
+    let pendingCount = 2;
+    let usedCount = 3;
+
+    const rewardIcons = {
+        'Envío Gratis': '🚚',
+        'Envío Express': '⚡',
+        'Embalaje Premium': '📦',
+        '-20% Internacional': '🌐',
+        'Planta un Árbol': '🌳'
+    };
+
+    function canjear(btn, nombre, coste) {
+        if (currentPoints < coste) {
+            showToast('❌ EcoPoints insuficientes para canjear ' + nombre, 'error');
+            return;
+        }
+        currentPoints -= coste;
+        document.querySelector('.points-number').textContent = currentPoints.toLocaleString('es-ES');
+
+        // Update progress bar
+        const pct = Math.min(Math.round((currentPoints / 3000) * 100), 100);
+        const bar = document.querySelector('.progress-bar-fill');
+        bar.style.width = pct + '%';
+        bar.querySelector('.progress-label').textContent = pct + '%';
+
+        const remaining = Math.max(3000 - currentPoints, 0);
+        document.querySelector('.progress-hint').innerHTML =
+            remaining > 0
+                ? `¡Te faltan <strong>${remaining} pts</strong> para alcanzar el Nivel Oro!`
+                : '🏆 ¡Has alcanzado el Nivel Oro!';
+
+        // Update stat card
+        document.querySelectorAll('.stat-value')[3].textContent = currentPoints.toLocaleString('es-ES');
+
+        // Add to pending rewards list
+        addPendingReward(nombre, coste);
+
+        showToast('✅ ¡' + nombre + ' canjeado con éxito! −' + coste + ' pts', 'success');
+    }
+
+    function addPendingReward(nombre, coste) {
+        const list = document.getElementById('pending-list');
+        const empty = document.getElementById('pending-empty');
+        const icon = rewardIcons[nombre] || '🎁';
+        const today = new Date().toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' });
+
+        const item = document.createElement('div');
+        item.className = 'rw-item rw-item-pending rw-item-new';
+        item.innerHTML = `
+            <div class="rw-item-icon">${icon}</div>
+            <div class="rw-item-info">
+                <span class="rw-item-name">${nombre}</span>
+                <span class="rw-item-date">Canjeado el ${today}</span>
+                <span class="rw-item-desc">Se aplicará automáticamente en tu próximo envío.</span>
+            </div>
+            <div class="rw-item-right">
+                <span class="rw-status rw-status-pending">Pendiente de uso</span>
+                <span class="rw-cost">−${coste.toLocaleString('es-ES')} pts</span>
+            </div>`;
+
+        list.prepend(item);
+        empty.style.display = 'none';
+
+        // Animate in
+        requestAnimationFrame(() => item.classList.add('rw-item-new-visible'));
+
+        // Update badge
+        pendingCount++;
+        document.getElementById('badge-pending').textContent = pendingCount;
+
+        // Switch to pending tab to show the new item
+        switchTab('pending', document.querySelectorAll('.rw-tab')[0]);
+    }
+
+    function switchTab(tab, btn) {
+        document.querySelectorAll('.rw-tab').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById('tab-pending').style.display = tab === 'pending' ? 'block' : 'none';
+        document.getElementById('tab-used').style.display   = tab === 'used'    ? 'block' : 'none';
+    }
+
+    function showToast(msg, type) {
+        const t = document.getElementById('toast');
+        t.textContent = msg;
+        t.className = 'toast toast-' + type + ' toast-show';
+        setTimeout(() => { t.className = 'toast'; }, 3500);
+    }
+</script>
+
+</body>
+</html>
