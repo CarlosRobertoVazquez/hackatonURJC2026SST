@@ -110,8 +110,8 @@
             margin-top: 16px;
             background: #f0faf0;
             border: 2px solid #4caf50;
-            border-radius: 10px;
-            padding: 20px 22px;
+            border-radius: 12px;
+            padding: 22px 24px;
             animation: slideDown .25s ease;
         }
         @keyframes slideDown {
@@ -119,107 +119,280 @@
             to   { opacity:1; transform:translateY(0); }
         }
         .eco-panel h3 {
-            margin: 0 0 6px;
-            font-size: 16px;
+            margin: 0 0 4px;
+            font-size: 17px;
             color: #1b5e20;
         }
         .eco-panel p.eco-intro {
-            margin: 0 0 16px;
+            margin: 0 0 18px;
             font-size: 13px;
-            color: #444;
+            color: #555;
         }
-        .delay-options {
+
+        /* ── Section headings inside panel ── */
+        .eco-section-title {
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: .6px;
+            text-transform: uppercase;
+            color: #2e7d32;
+            margin: 0 0 10px;
+        }
+        .eco-divider {
+            border: none;
+            border-top: 1px solid #c8e6c9;
+            margin: 16px 0;
+        }
+
+        /* ── Location list picker ── */
+        .loc-list {
             display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            margin-bottom: 18px;
+            flex-direction: column;
+            gap: 6px;
         }
-        .delay-opt {
+        .loc-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #fff;
+            border: 2px solid #c8e6c9;
+            border-radius: 10px;
+            padding: 10px 14px;
+            cursor: pointer;
+            transition: all .16s ease;
+        }
+        .loc-row:hover { border-color: #4caf50; background: #f4fbf4; }
+        .loc-row.selected {
+            border-color: #2e7d32;
+            background: #e8f5e9;
+            box-shadow: 0 0 0 3px rgba(46,125,50,.12);
+        }
+        .loc-row.no-eco {
+            border-color: #e0e0e0;
+        }
+        .loc-row.no-eco:hover { border-color: #bbb; background: #fafafa; }
+        .loc-row.no-eco.selected {
+            border-color: #999;
+            background: #f5f5f5;
+            box-shadow: 0 0 0 3px rgba(0,0,0,.06);
+        }
+        .loc-row-icon {
+            font-size: 22px;
+            flex-shrink: 0;
+            width: 32px;
+            text-align: center;
+        }
+        .loc-row-info { flex: 1; min-width: 0; }
+        .loc-row-name {
+            font-size: 13px;
+            font-weight: 700;
+            color: #1a1a1a;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .loc-row-addr {
+            font-size: 11px;
+            color: #777;
+            margin-top: 1px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .loc-row-right {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 4px;
+            flex-shrink: 0;
+        }
+        .loc-type-badge {
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: .3px;
+            text-transform: uppercase;
+            color: #999;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 1px 6px;
+        }
+        .loc-pts-pill {
+            font-size: 11px;
+            font-weight: 800;
+            padding: 2px 10px;
+            border-radius: 20px;
+            background: #e0e0e0;
+            color: #666;
+        }
+        .loc-pts-pill.green { background: #c8e6c9; color: #1b5e20; }
+        .loc-pts-pill.best  { background: #2e7d32; color: #fff; }
+        .loc-pts-pill.none  { background: #f0f0f0; color: #aaa; }
+
+        /* ── No-eco notice ── */
+        .no-eco-notice {
+            display: none;
+            align-items: center;
+            gap: 10px;
+            background: #fff8e1;
+            border: 1px solid #ffe082;
+            border-radius: 8px;
+            padding: 10px 14px;
+            font-size: 12px;
+            color: #7a5a00;
+            margin-bottom: 0;
+        }
+        .no-eco-notice.visible { display: flex; }
+
+        /* ── Date options (greyed when no-eco location) ── */
+        .date-options {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            transition: opacity .2s;
+        }
+        .date-options.disabled {
+            opacity: .35;
+            pointer-events: none;
+        }
+        .date-opt {
             cursor: pointer;
             border: 2px solid #c8e6c9;
             background: #fff;
             border-radius: 10px;
-            padding: 12px 16px;
+            padding: 12px 8px 10px;
             text-align: center;
             transition: all .18s ease;
-            min-width: 100px;
-            flex: 1;
+            position: relative;
         }
-        .delay-opt:hover {
-            border-color: #4caf50;
-            background: #e8f5e9;
-        }
-        .delay-opt.selected {
+        .date-opt:hover { border-color: #4caf50; background: #f1f8f1; }
+        .date-opt.selected {
             border-color: #2e7d32;
             background: #e8f5e9;
             box-shadow: 0 0 0 3px rgba(46,125,50,.15);
         }
-        .delay-opt .opt-days {
-            font-size: 18px;
-            font-weight: 800;
-            color: #2e7d32;
-            display: block;
-        }
-        .delay-opt .opt-label {
-            font-size: 11px;
-            color: #666;
-            display: block;
-            margin-bottom: 6px;
-        }
-        .delay-opt .opt-pts {
+        .date-opt .dopt-day   { font-size: 12px; font-weight: 800; color: #1a1a1a; }
+        .date-opt .dopt-date  { font-size: 10px; color: #666; margin: 2px 0 6px; }
+        .date-opt .dopt-delay { font-size: 10px; color: #888; margin-bottom: 8px; }
+        .date-opt .dopt-pts {
             display: inline-block;
             background: #2e7d32;
             color: #fff;
             font-size: 11px;
-            font-weight: 700;
-            padding: 2px 9px;
+            font-weight: 800;
+            padding: 3px 10px;
             border-radius: 20px;
+            transition: background .2s;
         }
-        .eco-summary {
-            display: none;
-            background: #fff;
-            border: 1px solid #c8e6c9;
-            border-radius: 8px;
-            padding: 14px 18px;
-            margin-bottom: 16px;
-            font-size: 14px;
-            gap: 20px;
-            flex-wrap: wrap;
+        /* Best combination highlight */
+        .date-opt.best-combo {
+            border-color: #ff8f00;
+            background: #fff8e1;
         }
-        .eco-summary.visible { display: flex; }
-        .eco-sum-item {
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
+        .date-opt.best-combo.selected {
+            border-color: #ff8f00;
+            background: #fff3cd;
+            box-shadow: 0 0 0 3px rgba(255,143,0,.2);
         }
-        .eco-sum-item span:first-child {
-            font-size: 11px;
-            color: #888;
-            font-weight: 600;
+        .date-opt.best-combo .dopt-pts { background: #ff8f00; }
+        .best-tag {
+            position: absolute;
+            top: -1px; right: -1px;
+            background: #ff8f00;
+            color: #fff;
+            font-size: 9px;
+            font-weight: 800;
+            padding: 2px 7px;
+            border-radius: 0 8px 0 8px;
             letter-spacing: .3px;
         }
-        .eco-sum-item span:last-child {
-            font-size: 16px;
-            font-weight: 800;
-            color: #1b5e20;
+
+        /* ── Live EcoPoints bar ── */
+        .pts-live-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #fff;
+            border: 1px solid #c8e6c9;
+            border-radius: 10px;
+            padding: 12px 18px;
+            gap: 12px;
+            flex-wrap: wrap;
         }
+        .pts-live-breakdown {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .pli {
+            display: flex;
+            flex-direction: column;
+            gap: 1px;
+        }
+        .pli-label {
+            font-size: 9px;
+            font-weight: 800;
+            color: #aaa;
+            letter-spacing: .5px;
+            text-transform: uppercase;
+        }
+        .pli-val {
+            font-size: 14px;
+            font-weight: 800;
+            color: #555;
+            transition: color .2s;
+        }
+        .pli-val.active { color: #2e7d32; }
+        .pts-live-sep { color: #ccc; font-size: 16px; }
+        .pts-live-total {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+        }
+        .plt-label {
+            font-size: 9px;
+            font-weight: 800;
+            color: #aaa;
+            letter-spacing: .5px;
+            text-transform: uppercase;
+        }
+        .plt-val {
+            font-size: 28px;
+            font-weight: 900;
+            color: #bbb;
+            line-height: 1;
+            transition: color .25s, transform .2s;
+        }
+        .plt-val.has-value { color: #1b5e20; }
+        .plt-val.bump { transform: scale(1.14); }
+
+        /* ── Confirm button ── */
         .btn-confirm-eco {
             background: linear-gradient(135deg, #2e7d32, #4caf50);
             color: #fff;
             border: none;
-            padding: 11px 26px;
-            border-radius: 7px;
+            padding: 13px 26px;
+            border-radius: 8px;
             font-size: 14px;
             font-weight: 700;
             cursor: pointer;
             transition: opacity .2s;
             width: 100%;
+            margin-top: 14px;
         }
-        .btn-confirm-eco:disabled {
-            opacity: .5;
-            cursor: default;
-        }
+        .btn-confirm-eco:disabled { opacity: .38; cursor: default; }
         .btn-confirm-eco:not(:disabled):hover { opacity: .88; }
+
+        /* ── Confirm hint ── */
+        .eco-confirm-hint {
+            text-align: center;
+            font-size: 12px;
+            color: #888;
+            margin: 6px 0 0;
+        }
+        .eco-confirm-hint.ready { color: #2e7d32; font-weight: 600; }
+
+        /* ── Activated message ── */
         .eco-activated-msg {
             display: none;
             align-items: center;
@@ -231,6 +404,8 @@
             font-size: 14px;
             color: #1b5e20;
             font-weight: 600;
+            flex-wrap: wrap;
+            margin-top: 14px;
         }
         .eco-activated-msg.visible { display: flex; }
         .eco-activated-msg .pts-pill {
@@ -241,6 +416,80 @@
             font-size: 15px;
             font-weight: 800;
             white-space: nowrap;
+            margin-left: auto;
+        }
+
+        /* ── Panel header row (title + radius slider) ── */
+        .eco-panel-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin-bottom: 18px;
+        }
+        .eco-panel-header > div:first-child { flex: 1; min-width: 0; }
+        .radius-control {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 4px;
+            flex-shrink: 0;
+            min-width: 160px;
+        }
+        .radius-label {
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: .5px;
+            text-transform: uppercase;
+            color: #2e7d32;
+            white-space: nowrap;
+        }
+        .radius-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .radius-val {
+            font-size: 13px;
+            font-weight: 900;
+            color: #1b5e20;
+            min-width: 44px;
+            text-align: right;
+            white-space: nowrap;
+        }
+        #radius-slider {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 110px;
+            height: 4px;
+            border-radius: 4px;
+            background: linear-gradient(to right, #4caf50 0%, #4caf50 var(--pct, 0%), #c8e6c9 var(--pct, 0%), #c8e6c9 100%);
+            outline: none;
+            cursor: pointer;
+        }
+        #radius-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #2e7d32;
+            border: 2px solid #fff;
+            box-shadow: 0 1px 4px rgba(0,0,0,.25);
+            cursor: pointer;
+        }
+        #radius-slider::-moz-range-thumb {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #2e7d32;
+            border: 2px solid #fff;
+            box-shadow: 0 1px 4px rgba(0,0,0,.25);
+            cursor: pointer;
+        }
+        /* Hidden location rows (outside radius) */
+        .loc-row.out-of-range {
+            display: none;
         }
     </style>
 </head>
@@ -280,57 +529,145 @@
 
             <!-- ECO OPTIONS PANEL (hidden until button click) -->
             <div class="eco-panel" id="eco-panel">
-                <h3>🌿 Elige el retraso de tu EnvíoEco</h3>
-                <p class="eco-intro">Tus paquetes se acumularán con otros envíos cercanos para reducir emisiones. A mayor retraso que aceptes, más EcoPoints ganarás.</p>
 
-                <div class="delay-options" id="delay-options">
-                    <div class="delay-opt" data-days="2" data-pts="80" onclick="selectDelay(this)">
-                        <span class="opt-label">Retraso de</span>
-                        <span class="opt-days">2 días</span>
-                        <span class="opt-pts">+80 pts</span>
+                <!-- Panel header: title + radius slider -->
+                <div class="eco-panel-header">
+                    <div>
+                        <h3>🌿 Configura tu EnvíoEco</h3>
+                        <p class="eco-intro" style="margin-bottom:0">Elige ubicación y fecha — los puntos se calculan instantáneamente con cada combinación.</p>
                     </div>
-                    <div class="delay-opt" data-days="3" data-pts="120" onclick="selectDelay(this)">
-                        <span class="opt-label">Retraso de</span>
-                        <span class="opt-days">3 días</span>
-                        <span class="opt-pts">+120 pts</span>
-                    </div>
-                    <div class="delay-opt" data-days="5" data-pts="200" onclick="selectDelay(this)">
-                        <span class="opt-label">Retraso de</span>
-                        <span class="opt-days">5 días</span>
-                        <span class="opt-pts">+200 pts</span>
-                    </div>
-                    <div class="delay-opt" data-days="7" data-pts="340" onclick="selectDelay(this)">
-                        <span class="opt-label">Retraso de</span>
-                        <span class="opt-days">7 días</span>
-                        <span class="opt-pts">+340 pts</span>
+                    <div class="radius-control">
+                        <span class="radius-label">📍 Radio de búsqueda</span>
+                        <div class="radius-row">
+                            <input type="range" id="radius-slider" min="1" max="10" value="3" step="0.5"
+                                oninput="onRadiusChange(this)">
+                            <span class="radius-val" id="radius-val">3 km</span>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Summary row (appears when an option is selected) -->
-                <div class="eco-summary" id="eco-summary">
-                    <div class="eco-sum-item">
-                        <span>NUEVA ENTREGA ESTIMADA</span>
-                        <span id="sum-date">—</span>
+                <!-- LOCATION ROW -->
+                <p class="eco-section-title">📍 Selecciona un punto de recogida</p>
+                <div class="loc-list" id="loc-list">
+
+                    <div class="loc-row no-eco" data-loc-bonus="0" data-eco="false" data-dist="0" data-loc-label="Tu casa (C/ Portillo, 42)" onclick="selectLocation(this)">
+                        <div class="loc-row-icon">🏠</div>
+                        <div class="loc-row-info">
+                            <div class="loc-row-name">Tu casa</div>
+                            <div class="loc-row-addr">C/ Portillo, 42 – Piso 3º B</div>
+                        </div>
+                        <div class="loc-row-right">
+                            <span class="loc-type-badge">Domicilio</span>
+                            <span class="loc-pts-pill none">Sin EcoPoints</span>
+                        </div>
                     </div>
-                    <div class="eco-sum-item">
-                        <span>RETRASO</span>
-                        <span id="sum-delay">—</span>
+
+                    <div class="loc-row" data-loc-bonus="60" data-eco="true" data-dist="0.8" data-loc-label="Correos – C/ Leganés, 3" onclick="selectLocation(this)">
+                        <div class="loc-row-icon">📨</div>
+                        <div class="loc-row-info">
+                            <div class="loc-row-name">Correos</div>
+                            <div class="loc-row-addr">C/ Leganés, 3</div>
+                        </div>
+                        <div class="loc-row-right">
+                            <span class="loc-type-badge">Oficina postal</span>
+                            <span class="loc-pts-pill green">hasta +400 pts</span>
+                        </div>
                     </div>
-                    <div class="eco-sum-item">
-                        <span>ECOPOINTS A GANAR</span>
-                        <span id="sum-pts">—</span>
+
+                    <div class="loc-row" data-loc-bonus="60" data-eco="true" data-dist="1.5" data-loc-label="Lotterías – C/ Murcia, 17" onclick="selectLocation(this)">
+                        <div class="loc-row-icon">🎫</div>
+                        <div class="loc-row-info">
+                            <div class="loc-row-name">Lotterías y apuestas</div>
+                            <div class="loc-row-addr">C/ Murcia, 17</div>
+                        </div>
+                        <div class="loc-row-right">
+                            <span class="loc-type-badge">Estanquillo</span>
+                            <span class="loc-pts-pill green">hasta +400 pts</span>
+                        </div>
                     </div>
-                    <div class="eco-sum-item">
-                        <span>CO₂ AHORRADO</span>
-                        <span id="sum-co2">—</span>
+
+                    <div class="loc-row" data-loc-bonus="80" data-eco="true" data-dist="2.3" data-loc-label="Supermercado Día – C/ Real, 8" onclick="selectLocation(this)">
+                        <div class="loc-row-icon">🛒</div>
+                        <div class="loc-row-info">
+                            <div class="loc-row-name">Supermercado Día</div>
+                            <div class="loc-row-addr">C/ Real, 8</div>
+                        </div>
+                        <div class="loc-row-right">
+                            <span class="loc-type-badge">Supermercado</span>
+                            <span class="loc-pts-pill green">hasta +420 pts</span>
+                        </div>
+                    </div>
+
+                    <div class="loc-row" data-loc-bonus="80" data-eco="true" data-dist="3.7" data-loc-label="Farmacia Central – Av. Constitución, 5" onclick="selectLocation(this)">
+                        <div class="loc-row-icon">💊</div>
+                        <div class="loc-row-info">
+                            <div class="loc-row-name">Farmacia Central</div>
+                            <div class="loc-row-addr">Av. Constitución, 5</div>
+                        </div>
+                        <div class="loc-row-right">
+                            <span class="loc-type-badge">Farmacia</span>
+                            <span class="loc-pts-pill green">hasta +420 pts</span>
+                        </div>
+                    </div>
+
+                    <div class="loc-row" data-loc-bonus="120" data-eco="true" data-dist="5.2" data-loc-label="Casillero DHL – Estación Atocha" onclick="selectLocation(this)">
+                        <div class="loc-row-icon">📦</div>
+                        <div class="loc-row-info">
+                            <div class="loc-row-name">Casillero DHL</div>
+                            <div class="loc-row-addr">Estación Atocha – Planta baja</div>
+                        </div>
+                        <div class="loc-row-right">
+                            <span class="loc-type-badge">Casillero 24 h</span>
+                            <span class="loc-pts-pill best">⭐ hasta +460 pts</span>
+                        </div>
+                    </div>
+
+                </div>
+
+                <hr class="eco-divider">
+
+                <!-- DATE ROW -->
+                <p class="eco-section-title">📅 ¿Cuándo puedes recibirlo?</p>
+                <!-- No-eco notice (shown when home is selected) -->
+                <div class="no-eco-notice" id="no-eco-notice">
+                    <span style="font-size:18px">⚠️</span>
+                    <span>La entrega a <strong>domicilio</strong> no genera EcoPoints: no permite agrupar paquetes. Elige otro punto de recogida para ganar puntos.</span>
+                </div>
+                <div class="date-options" id="date-options">
+                    <!-- built by JS -->
+                </div>
+
+                <hr class="eco-divider">
+
+                <!-- LIVE ECOPOINTS BAR -->
+                <div class="pts-live-bar">
+                    <div class="pts-live-breakdown">
+                        <div class="pli">
+                            <span class="pli-label">Por ubicación</span>
+                            <span class="pli-val" id="pli-loc">—</span>
+                        </div>
+                        <span class="pts-live-sep">+</span>
+                        <div class="pli">
+                            <span class="pli-label">Por fecha</span>
+                            <span class="pli-val" id="pli-date">—</span>
+                        </div>
+                        <span class="pts-live-sep">=</span>
+                    </div>
+                    <div class="pts-live-total">
+                        <span class="plt-label">Total EcoPoints</span>
+                        <span class="plt-val" id="plt-val">—</span>
                     </div>
                 </div>
 
                 <button class="btn-confirm-eco" id="btn-confirm" disabled onclick="confirmEco()">Confirmar EnvíoEco</button>
+                <p class="eco-confirm-hint" id="eco-confirm-hint">Selecciona una ubicación y una fecha para continuar</p>
 
                 <!-- Post-confirmation message -->
                 <div class="eco-activated-msg" id="eco-activated">
-                    <span>✅ EnvíoEco activado · Tu nueva entrega llegará el <strong id="activated-date">—</strong></span>
+                    <div>
+                        <div>✅ EnvíoEco activado</div>
+                        <div style="font-size:13px;font-weight:400;margin-top:3px;">Entrega el <strong id="activated-date">—</strong> · <span id="activated-loc-label">—</span></div>
+                    </div>
                     <span class="pts-pill" id="activated-pts">—</span>
                 </div>
             </div>
@@ -390,86 +727,256 @@
     </main>
 
     <script>
-        // ── Eco panel toggle ──────────────────────────────────────
-        const btnEcoBtn   = document.getElementById('btn-eco');
-        const ecoPanel    = document.getElementById('eco-panel');
-
+        // ── Panel toggle ─────────────────────────────────────────────
+        const btnEcoBtn = document.getElementById('btn-eco');
+        const ecoPanel  = document.getElementById('eco-panel');
         btnEcoBtn.addEventListener('click', () => {
             if (btnEcoBtn.disabled) return;
             const isOpen = ecoPanel.style.display === 'block';
             ecoPanel.style.display = isOpen ? 'none' : 'block';
         });
 
-        // ── Delay option selection ────────────────────────────────
-        let selectedDays = null;
-        let selectedPts  = null;
+        // ── State ─────────────────────────────────────────────────
+        let selectedLocBonus = null;
+        let selectedLocLabel = null;
+        let selectedLocEco   = null; // false = home delivery, no date pts
+        let selectedDays     = null;
+        let selectedDatePts  = null;
 
-        // Base delivery date: Tuesday 25 Feb 2026
-        const baseDelivery = new Date(2026, 1, 25); // month is 0-indexed
+        const baseDelivery = new Date(2026, 1, 25); // Tue 25 Feb 2026
 
-        function selectDelay(el) {
-            document.querySelectorAll('.delay-opt').forEach(o => o.classList.remove('selected'));
-            el.classList.add('selected');
+        const DATE_SLOTS = [
+            { days: 2, pts: 80  },
+            { days: 3, pts: 120 },
+            { days: 5, pts: 200 },
+            { days: 7, pts: 340 },
+        ];
+        const DAYS_ES   = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+        const MONTHS_ES = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
 
-            selectedDays = parseInt(el.dataset.days);
-            selectedPts  = parseInt(el.dataset.pts);
-
-            // Compute new date
-            const newDate = new Date(baseDelivery);
-            newDate.setDate(newDate.getDate() + selectedDays);
-            const dateStr = newDate.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' });
-            const dateStrCap = dateStr.charAt(0).toUpperCase() + dateStr.slice(1);
-
-            // CO2 saving estimate (40% base, scales slightly with days)
-            const co2Base   = 4.8;
-            const savingPct = Math.min(40 + (selectedDays - 2) * 2, 55);
-            const co2Saved  = (co2Base * savingPct / 100).toFixed(1);
-
-            // Update summary
-            document.getElementById('sum-date').textContent  = dateStrCap;
-            document.getElementById('sum-delay').textContent = `+${selectedDays} días`;
-            document.getElementById('sum-pts').textContent   = `+${selectedPts} pts`;
-            document.getElementById('sum-co2').textContent   = `−${co2Saved} kg CO₂`;
-
-            const summary = document.getElementById('eco-summary');
-            summary.classList.add('visible');
-
-            document.getElementById('btn-confirm').disabled = false;
+        function fmtLong(d) {
+            const s = d.toLocaleDateString('es-ES', { weekday:'long', day:'numeric', month:'long' });
+            return s.charAt(0).toUpperCase() + s.slice(1);
         }
 
-        // ── Confirm ───────────────────────────────────────────────
-        function confirmEco() {
-            const newDate = new Date(baseDelivery);
-            newDate.setDate(newDate.getDate() + selectedDays);
-            const dateStr = newDate.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' });
-            const dateStrCap = dateStr.charAt(0).toUpperCase() + dateStr.slice(1);
+        // ── Build date cards on load ──────────────────────────────
+        function buildDateCards() {
+            const container  = document.getElementById('date-options');
+            const noEco      = selectedLocEco === false;
+            const locBonus   = (!noEco && selectedLocBonus !== null) ? selectedLocBonus : 0;
+            const maxTotal   = Math.max(...DATE_SLOTS.map(s => s.pts + locBonus));
 
-            // Disable options and confirm button
-            document.querySelectorAll('.delay-opt').forEach(o => { o.style.pointerEvents = 'none'; o.style.opacity = '.6'; });
-            document.querySelector('.delay-opt.selected').style.opacity = '1';
-            document.getElementById('btn-confirm').disabled = true;
+            container.innerHTML = '';
+            container.classList.toggle('disabled', noEco);
+
+            DATE_SLOTS.forEach(slot => {
+                const d     = new Date(baseDelivery);
+                d.setDate(d.getDate() + slot.days);
+                const total      = noEco ? 0 : slot.pts + locBonus;
+                const isBest     = !noEco && (total === maxTotal);
+                const wasSelected = (selectedDays === slot.days);
+
+                const div = document.createElement('div');
+                div.className = 'date-opt' + (isBest ? ' best-combo' : '') + (wasSelected && !noEco ? ' selected' : '');
+                div.dataset.days    = slot.days;
+                div.dataset.datePts = noEco ? 0 : slot.pts;
+                div.innerHTML = (isBest ? '<span class="best-tag">⭐ Máximo</span>' : '') + `
+                    <div class="dopt-day">${DAYS_ES[d.getDay()]}</div>
+                    <div class="dopt-date">${d.getDate()} ${MONTHS_ES[d.getMonth()]}</div>
+                    <div class="dopt-delay">retraso +${slot.days} días</div>
+                    <span class="dopt-pts" style="${noEco ? 'background:#ccc;color:#888' : ''}">${noEco ? '0 pts' : '+' + total + ' pts'}</span>
+                `;
+                if (!noEco) div.addEventListener('click', () => selectDate(div));
+                container.appendChild(div);
+            });
+        }
+
+        // initial build (no location selected yet)
+        buildDateCards();
+
+        // ── Radius slider ─────────────────────────────────────────
+        function onRadiusChange(slider) {
+            const km  = parseFloat(slider.value);
+            const pct = ((km - 1) / (10 - 1)) * 100;
+            slider.style.setProperty('--pct', pct + '%');
+            document.getElementById('radius-val').textContent = km % 1 === 0 ? km + ' km' : km.toFixed(1) + ' km';
+            filterByRadius(km);
+        }
+
+        function filterByRadius(km) {
+            document.querySelectorAll('.loc-row').forEach(row => {
+                const dist = parseFloat(row.dataset.dist);
+                // Tu casa (dist=0) always visible
+                const inRange = dist === 0 || dist <= km;
+                row.classList.toggle('out-of-range', !inRange);
+                // If the selected row goes out of range, deselect it
+                if (!inRange && row.classList.contains('selected')) {
+                    row.classList.remove('selected');
+                    selectedLocBonus = null;
+                    selectedLocLabel = null;
+                    selectedLocEco   = null;
+                    selectedDays     = null;
+                    selectedDatePts  = null;
+                    document.getElementById('pli-loc').textContent = '—';
+                    document.getElementById('pli-loc').classList.remove('active');
+                    document.getElementById('pli-date').textContent = '—';
+                    document.getElementById('pli-date').classList.remove('active');
+                    document.getElementById('no-eco-notice').classList.remove('visible');
+                    buildDateCards();
+                    updateLiveTotal();
+                }
+            });
+        }
+
+        // Apply initial radius on load
+        (function() {
+            const slider = document.getElementById('radius-slider');
+            const initKm = parseFloat(slider.value);
+            const pct    = ((initKm - 1) / (10 - 1)) * 100;
+            slider.style.setProperty('--pct', pct + '%');
+            filterByRadius(initKm);
+        })();
+
+        // ── Set max-pts labels on location rows ───────────────────
+        const MAX_DATE_PTS = Math.max(...DATE_SLOTS.map(s => s.pts));
+        document.querySelectorAll('.loc-row[data-eco="true"]').forEach(row => {
+            const bonus = parseInt(row.dataset.locBonus);
+            const pill  = row.querySelector('.loc-pts-pill');
+            if (pill) {
+                const isBest = bonus === Math.max(...[
+                    ...document.querySelectorAll('.loc-row[data-eco="true"]')
+                ].map(r => parseInt(r.dataset.locBonus)));
+                pill.textContent = (isBest ? '⭐ ' : '') + 'hasta +' + (bonus + MAX_DATE_PTS) + ' pts';
+            }
+        });
+
+        // ── Location selection ───────────────────────────────────────
+        function selectLocation(el) {
+            document.querySelectorAll('.loc-row').forEach(o => o.classList.remove('selected'));
+            el.classList.add('selected');
+            selectedLocBonus = parseInt(el.dataset.locBonus);
+            selectedLocLabel = el.dataset.locLabel;
+            selectedLocEco   = el.dataset.eco !== 'false';
+
+            const noEco   = !selectedLocEco;
+            const notice  = document.getElementById('no-eco-notice');
+            notice.classList.toggle('visible', noEco);
+
+            // Reset date when location changes
+            if (noEco) {
+                selectedDays = null; selectedDatePts = null;
+            }
+
+            // Rebuild date cards
+            buildDateCards();
+
+            // Re-attach selected date if still valid
+            if (!noEco && selectedDays !== null) {
+                document.querySelectorAll('.date-opt').forEach(o => {
+                    if (parseInt(o.dataset.days) === selectedDays) o.classList.add('selected');
+                });
+            }
+
+            // Update live bar
+            const locEl = document.getElementById('pli-loc');
+            locEl.textContent = noEco ? '0 pts' : '+' + selectedLocBonus + ' pts';
+            locEl.classList.toggle('active', !noEco);
+
+            if (noEco) {
+                document.getElementById('pli-date').textContent = '—';
+                document.getElementById('pli-date').classList.remove('active');
+            }
+            updateLiveTotal();
+        }
+
+        // ── Date selection ─────────────────────────────────────────
+        function selectDate(el) {
+            document.querySelectorAll('.date-opt').forEach(o => o.classList.remove('selected'));
+            el.classList.add('selected');
+            selectedDays    = parseInt(el.dataset.days);
+            selectedDatePts = parseInt(el.dataset.datePts);
+
+            const dateEl = document.getElementById('pli-date');
+            dateEl.textContent = '+' + selectedDatePts + ' pts';
+            dateEl.classList.add('active');
+            updateLiveTotal();
+        }
+
+        // ── Live total update ───────────────────────────────────────
+        function updateLiveTotal() {
+            const noEco     = selectedLocEco === false;
+            const bothReady = !noEco && selectedLocBonus !== null && selectedDays !== null;
+            const pltEl     = document.getElementById('plt-val');
+            const hint      = document.getElementById('eco-confirm-hint');
+            const btn       = document.getElementById('btn-confirm');
+
+            if (noEco) {
+                pltEl.textContent = '0 pts';
+                pltEl.classList.remove('has-value');
+                hint.textContent = 'Esta ubicación no genera EcoPoints. Selecciona otro punto.';
+                hint.classList.remove('ready');
+                btn.disabled = true;
+            } else if (bothReady) {
+                const total = selectedDatePts + selectedLocBonus;
+                pltEl.textContent = '+' + total + ' pts';
+                pltEl.classList.add('has-value');
+                pltEl.classList.add('bump');
+                setTimeout(() => pltEl.classList.remove('bump'), 300);
+                btn.disabled = false;
+                hint.textContent = '¡Listo! Pulsa Confirmar para activar EnvíoEco';
+                hint.classList.add('ready');
+            } else if (selectedLocBonus !== null) {
+                pltEl.textContent = '—';
+                pltEl.classList.remove('has-value');
+                hint.textContent = 'Ahora selecciona una fecha de entrega';
+                hint.classList.remove('ready');
+                btn.disabled = true;
+            } else {
+                pltEl.textContent = '—';
+                pltEl.classList.remove('has-value');
+                hint.textContent = 'Selecciona un punto de recogida y una fecha';
+                hint.classList.remove('ready');
+                btn.disabled = true;
+            }
+        }
+
+        // ── Confirm ────────────────────────────────────────────────
+        function confirmEco() {
+            const totalPts    = selectedDatePts + selectedLocBonus;
+            const newDate     = new Date(baseDelivery);
+            newDate.setDate(newDate.getDate() + selectedDays);
+            const dateStrLong = fmtLong(newDate);
+
+            // Lock UI
+            document.querySelectorAll('.loc-row, .date-opt').forEach(o => {
+                o.style.pointerEvents = 'none';
+                o.style.opacity = '.5';
+            });
+            document.querySelectorAll('.loc-row.selected, .date-opt.selected').forEach(o => o.style.opacity = '1');
+            document.getElementById('radius-slider').disabled = true;
+            document.getElementById('btn-confirm').style.display = 'none';
+            document.getElementById('eco-confirm-hint').style.display = 'none';
 
             // Show activation message
-            document.getElementById('activated-date').textContent = dateStrCap;
-            document.getElementById('activated-pts').textContent  = `+${selectedPts} 🍃 EcoPoints`;
+            document.getElementById('activated-date').textContent      = dateStrLong;
+            document.getElementById('activated-loc-label').textContent = selectedLocLabel;
+            document.getElementById('activated-pts').textContent       = `+${totalPts} 🍃 pts`;
             document.getElementById('eco-activated').classList.add('visible');
 
             // Update shipment card
-            const badge   = document.getElementById('badge-servicio');
-            const nota    = document.getElementById('nota');
+            const badge    = document.getElementById('badge-servicio');
+            const nota     = document.getElementById('nota');
             const estadoEl = document.getElementById('estado');
-            if (badge) { badge.textContent = 'Servicio: EnvíoEco'; badge.style.background = '#d9f7be'; badge.style.color = '#135200'; }
+            if (badge)    { badge.textContent = 'Servicio: EnvíoEco ♻'; badge.style.background = '#d9f7be'; badge.style.color = '#135200'; }
             if (estadoEl) estadoEl.textContent = 'En tránsito (modo ecológico)';
-            if (nota) nota.innerHTML = `Has activado <strong>EnvíoEco</strong> con un retraso de <strong>${selectedDays} días</strong>. Ganarás <strong>+${selectedPts} EcoPoints</strong> al completarse la entrega.`;
+            if (nota)     nota.innerHTML = `Has activado <strong>EnvíoEco</strong> con entrega en <strong>${selectedLocLabel}</strong> el <strong>${dateStrLong}</strong>. Ganarás <strong>+${totalPts} EcoPoints</strong> al completarse la entrega.`;
 
-            // Update impact bar if available
             if (window.__updateImpactBar) window.__updateImpactBar();
 
-            // Disable main button
-            btnEcoBtn.textContent = '✅ EnvíoEco activado';
-            btnEcoBtn.disabled = true;
-            btnEcoBtn.style.opacity = .7;
-            btnEcoBtn.style.cursor = 'default';
+            btnEcoBtn.textContent   = '✅ EnvíoEco activado';
+            btnEcoBtn.disabled      = true;
+            btnEcoBtn.style.opacity = '.7';
+            btnEcoBtn.style.cursor  = 'default';
         }
     </script>
 
