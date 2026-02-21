@@ -25,91 +25,11 @@ body{background:var(--dark);color:var(--txt);font-family:'DM Sans',sans-serif;di
 .hdr-sub{font-size:10px;color:#666;}
 .hdr-right{display:flex;align-items:center;gap:8px;}
 .day-pill{font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:1px;color:#555;background:#fff;border-radius:20px;padding:3px 12px;}
-.btn-play{background:var(--red);color:#fff;border:none;cursor:pointer;font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:1px;padding:8px 24px;border-radius:6px;transition:opacity .2s;}
-.btn-play:hover:not(:disabled){opacity:.85;}
-.btn-play:disabled{opacity:.4;cursor:default;}
 .btn-sm{background:transparent;color:#555;border:1.5px solid #888;cursor:pointer;font-size:11px;font-weight:700;padding:7px 13px;border-radius:6px;transition:all .2s;}
 .btn-sm:hover{color:#111;border-color:#111;}
 
-/* ── TABS ── */
-.tabs{display:flex;flex-shrink:0;border-bottom:2px solid var(--border);}
-.tab{padding:10px 28px;font-size:12px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;cursor:pointer;color:var(--muted);border-bottom:3px solid transparent;margin-bottom:-2px;transition:all .2s;user-select:none;}
-.tab:hover{color:var(--txt);}
-.tab.active.eco-tab{color:var(--green2);border-bottom-color:var(--green2);}
-.tab.active.biz-tab{color:var(--yellow);border-bottom-color:var(--yellow);}
-
-/* ── PAGES ── */
-.page{display:none;flex:1;overflow:hidden;}
-.page.active{display:flex;flex-direction:column;}
-
-/* ══════════════════════════════════════════
-   ECO PAGE
-══════════════════════════════════════════ */
-.eco-main{flex:1;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr auto;overflow:hidden;}
-.side{display:flex;flex-direction:column;overflow:hidden;border-right:1px solid var(--border);}
-.side:last-of-type{border-right:none;}
-.side-hdr{padding:10px 18px;flex-shrink:0;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;}
-.side-hdr.lhdr{background:rgba(212,5,17,.1);}
-.side-hdr.rhdr{background:rgba(46,125,50,.12);}
-.side-badge{font-size:9px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;padding:2px 9px;border-radius:20px;flex-shrink:0;}
-.side-badge.r{background:var(--red);color:#fff;}
-.side-badge.g{background:var(--green);color:#fff;}
-.side-title{font-size:12px;font-weight:800;}
-.side-desc{font-size:9px;color:var(--muted);}
-.side-scroll{flex:1;overflow-y:auto;padding:12px 16px;scrollbar-width:thin;scrollbar-color:var(--border) transparent;}
-.drow{margin-bottom:10px;opacity:0;transition:opacity .3s;}
-.drow.show{opacity:1;}
-.dname{font-size:9px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);margin-bottom:5px;display:flex;align-items:center;gap:5px;}
-.dname::after{content:'';flex:1;border-top:1px solid var(--border);}
-.t-track{display:flex;flex-wrap:wrap;gap:6px;min-height:44px;align-items:flex-start;}
-.tcard{display:flex;flex-direction:column;align-items:center;gap:2px;background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:5px 7px;opacity:0;transform:scale(.7);transition:opacity .35s,transform .35s cubic-bezier(.175,.885,.32,1.275);}
-.tcard.pop{opacity:1;transform:scale(1);}
-.tcard.rc{border-color:var(--red);}
-.tcard.gc{border-color:var(--green2);}
-.temoji{font-size:22px;line-height:1;}
-.tsmoke{font-size:10px;min-height:13px;}
-.spuff{display:inline-block;opacity:0;}
-.spuff.emit{animation:smoke 1.6s ease-out forwards;}
-@keyframes smoke{0%{opacity:.7;transform:translateY(0) scale(1);}100%{opacity:0;transform:translateY(-10px) scale(1.6);}}
-.tlabel{font-size:9px;font-weight:700;}
-.tlabel.rl{color:var(--red);}
-.tlabel.gl{color:var(--green2);}
-.parea{background:#ececec;border:1px dashed #bbb;border-radius:7px;padding:6px 9px;min-height:34px;display:flex;flex-wrap:wrap;gap:3px;align-items:center;}
-.plabel{font-size:9px;font-weight:800;letter-spacing:.3px;text-transform:uppercase;color:#777;width:100%;margin-bottom:3px;}
-.pdot{font-size:13px;opacity:0;transition:opacity .2s,transform .2s;transform:scale(.3);}
-.pdot.show{opacity:1;transform:scale(1);}
-.pdot.gone{opacity:.1;transform:scale(.8);}
-/* bottom bar */
-.bbar{grid-column:1/-1;border-top:1px solid var(--border);background:#f8f8f8;padding:11px 18px;display:grid;grid-template-columns:1fr 1fr;gap:12px;flex-shrink:0;}
-.mgroup{display:flex;gap:9px;}
-.metric{flex:1;background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:8px 11px;position:relative;overflow:hidden;}
-.ml{font-size:9px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);}
-.mv{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:1px;line-height:1.1;transition:color .3s;}
-.ms{font-size:9px;color:var(--muted);}
-.metric.rm .mv{color:var(--red);}
-.metric.gm .mv{color:var(--green2);}
-.mfill{position:absolute;bottom:0;left:0;width:100%;height:3px;}
-.mfill.rf{background:var(--red);}
-.mfill.gf{background:var(--green2);}
-/* streak */
-.streak{position:fixed;top:60px;left:50%;transform:translateX(-50%);background:rgba(255,255,255,.95);border:1px solid var(--green);border-radius:30px;padding:5px 18px;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1px;color:var(--green);white-space:nowrap;opacity:0;transition:opacity .3s;z-index:50;pointer-events:none;box-shadow:0 2px 8px rgba(0,0,0,.15);}
-.streak.show{opacity:1;}
-/* eco final overlay */
-.fover{position:fixed;inset:0;background:rgba(0,0,0,.93);display:none;align-items:center;justify-content:center;z-index:100;cursor:pointer;}
-.fover.show{display:flex;animation:fin .5s ease;}
-@keyframes fin{from{opacity:0}to{opacity:1}}
-.fcard{background:linear-gradient(150deg,#0d1f0d,#090909);border:2px solid var(--green);border-radius:20px;padding:34px 48px;max-width:800px;width:92%;text-align:center;animation:fpop .5s cubic-bezier(.175,.885,.32,1.275);}
-@keyframes fpop{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:scale(1)}}
-.ftitle{font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:2px;color:var(--green2);margin-bottom:4px;}
-.fsub{font-size:12px;color:#777;margin-bottom:22px;}
-.fnums{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px;}
-.fn{background:#0c1e0c;border:1px solid var(--green);border-radius:12px;padding:16px 12px;}
-.fnl{font-size:9px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;color:var(--green3);}
-.fnv{font-family:'Bebas Neue',sans-serif;font-size:44px;letter-spacing:1px;color:#fff;line-height:1;}
-.fns{font-size:11px;color:var(--green2);font-weight:700;margin-top:2px;}
-.fequiv{background:#111;border:1px solid #1e1e1e;border-radius:10px;padding:12px 18px;font-size:12px;color:#999;line-height:1.7;}
-.fequiv strong{color:var(--green2);}
-.fhint{font-size:10px;color:#333;margin-top:14px;}
+/* ── PAGE ── */
+.page{flex:1;overflow:hidden;display:flex;flex-direction:column;}
 
 /* ══════════════════════════════════════════
    BUSINESS PAGE
@@ -168,83 +88,19 @@ body{background:var(--dark);color:var(--txt);font-family:'DM Sans',sans-serif;di
 <!-- HEADER -->
 <div class="hdr">
   <div style="display:flex;align-items:center;gap:12px;">
-    <div class="hdr-logo">DHL</div>
+    <a href="index.html" class="hdr-logo" style="text-decoration:none;">DHL</a>
     <div>
       <div class="hdr-title">EnvíoEco — Simulación de impacto</div>
       <div class="hdr-sub">7 días · Zona 28931 · 72 paquetes</div>
     </div>
   </div>
-  <div class="hdr-right">
-    <div class="day-pill" id="dpill">DÍA 0 / 7</div>
-    <button class="btn-sm" onclick="resetSim()">↺ Reiniciar</button>
-    <button class="btn-play" id="bplay" onclick="startSim()">▶ INICIAR</button>
-  </div>
+
 </div>
 
-<!-- TABS -->
-<div class="tabs">
-  <div class="tab eco-tab active" onclick="switchTab('eco')">🌿 Impacto Medioambiental</div>
-  <div class="tab biz-tab" onclick="switchTab('biz')">📊 Impacto económico</div>
-</div>
 
-<!-- ══ ECO PAGE ══ -->
-<div class="page active" id="page-eco">
-  <div class="eco-main">
-    <div class="side">
-      <div class="side-hdr lhdr">
-        <span class="side-badge r">SITUACIÓN ACTUAL</span>
-        <div>
-          <div class="side-title">Sin EnvíoEco</div>
-          <div class="side-desc">Un camión cada día · sin consolidar · siempre a media carga</div>
-        </div>
-      </div>
-      <div class="side-scroll" id="lscroll"></div>
-    </div>
-    <div class="side">
-      <div class="side-hdr rhdr">
-        <span class="side-badge g">CON ENVÍOECO</span>
-        <div>
-          <div class="side-title">Algoritmo de consolidación</div>
-          <div class="side-desc">Acumula paquetes · sale cuando la ruta es rentable</div>
-        </div>
-      </div>
-      <div class="side-scroll" id="rscroll"></div>
-    </div>
-    <div class="bbar">
-      <div class="mgroup">
-        <div class="metric rm">
-          <div class="ml">🚛 Camiones (actual)</div>
-          <div class="mv" id="lt">0</div>
-          <div class="ms">rutas lanzadas</div>
-          <div class="mfill rf"></div>
-        </div>
-        <div class="metric rm">
-          <div class="ml">☁️ CO₂ (actual)</div>
-          <div class="mv" id="lc">0 kg</div>
-          <div class="ms">emisiones acumuladas</div>
-          <div class="mfill rf"></div>
-        </div>
-      </div>
-      <div class="mgroup">
-        <div class="metric gm">
-          <div class="ml">🚛 Camiones (EnvíoEco)</div>
-          <div class="mv" id="rt">0</div>
-          <div class="ms">rutas lanzadas</div>
-          <div class="mfill gf"></div>
-        </div>
-        <div class="metric gm">
-          <div class="ml">🌿 CO₂ (EnvíoEco)</div>
-          <div class="mv" id="rc">0 kg</div>
-          <div class="ms">emisiones acumuladas</div>
-          <div class="mfill gf"></div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
 
 <!-- ══ BUSINESS PAGE ══ -->
-<div class="page" id="page-biz">
+<div class="page active" id="page-biz">
   <div class="biz-page" id="biz-scroll">
 
     <!-- Scenario selector -->
@@ -337,161 +193,9 @@ body{background:var(--dark);color:var(--txt);font-family:'DM Sans',sans-serif;di
   </div>
 </div>
 
-<!-- Streak & Eco final overlay -->
 <script src="dashboard-stats.js"></script>
-<div class="streak" id="streak">🌿 CO₂ ahorrado: 0 kg</div>
-<div class="fover" id="fover" onclick="this.classList.remove('show')">
-  <div class="fcard">
-    <div class="ftitle">🌿 Impacto de EnvíoEco en 7 días</div>
-    <div class="fsub">Zona 28931 · 72 paquetes · OptimizadorEcoPuntosFinal</div>
-    <div class="fnums">
-      <div class="fn"><div class="fnl">Rutas ahorradas</div><div class="fnv" id="fn1">—</div><div class="fns" id="fn1s">—</div></div>
-      <div class="fn"><div class="fnl">CO₂ evitado</div><div class="fnv" id="fn2">—</div><div class="fns" id="fn2s">—</div></div>
-      <div class="fn"><div class="fnl">Reducción</div><div class="fnv" id="fn3">—</div><div class="fns">de las emisiones</div></div>
-    </div>
-    <div class="fequiv" id="fequiv"></div>
-    <div class="fhint">Toca para cerrar · cambia a "Análisis de Negocio" para ver el impacto económico</div>
-  </div>
-</div>
 
 <script>
-/* ═══════════════════════════════════════════
-   ECO SIMULATION
-═══════════════════════════════════════════ */
-const DAYS=7, DAY_NAMES=['Lun 25','Mar 26','Mié 27','Jue 28','Vie 1','Sáb 2','Dom 3'];
-const DAILY_PKGS=[8,11,7,14,9,13,10];
-const CO2_TRUCK=12, THRESHOLD=22, STEP_MS=1500, TRUCK_CAP=50, COST_TRUCK=60;
-let timer=null,curDay=0,running=false;
-const L={t:0,co2:0,cost:0}, R={t:0,co2:0,cost:0,pending:0,dots:[]};
-// live data for biz charts
-const liveL={routes:[],co2:[],cost:[]}, liveR={routes:[],co2:[],cost:[]};
-
-function animNum(id,val,suf=''){
-  const el=document.getElementById(id);if(!el)return;
-  const from=parseFloat(el.textContent)||0;
-  const t0=performance.now();
-  (function tick(now){const p=Math.min(1,(now-t0)/500);el.textContent=Math.round(from+(val-from)*p)+suf;if(p<1)requestAnimationFrame(tick);})(performance.now());
-}
-function scrollB(id){const e=document.getElementById(id);if(e)setTimeout(()=>e.scrollTop=e.scrollHeight,80);}
-function makeTruck(cid,pkgs,side){
-  const w=document.getElementById(cid);if(!w)return;
-  const g=side==='r';
-  const n=pkgs<=15?1:pkgs<=30?2:3;
-  const c=document.createElement('div');c.className=`tcard ${g?'gc':'rc'}`;
-  c.innerHTML=`<div class="temoji">🚛</div><div class="tsmoke">${[...Array(n)].map(()=>`<span class="spuff">💨</span>`).join('')}</div><div class="tlabel ${g?'gl':'rl'}">${pkgs}p · ${pkgs<=15?'bajo':pkgs<=30?'medio':'lleno'}</div>`;
-  w.appendChild(c);requestAnimationFrame(()=>{c.offsetHeight;c.classList.add('pop');});
-  setTimeout(()=>c.querySelectorAll('.spuff').forEach((s,i)=>setTimeout(()=>s.classList.add('emit'),i*200)),400);
-}
-function makeLDay(d,pkgs){
-  const div=document.createElement('div');div.className='drow';div.id=`ld${d}`;
-  div.innerHTML=`<div class="dname">${DAY_NAMES[d]} · +${pkgs} paquetes</div><div class="t-track" id="lt${d}"></div>`;
-  document.getElementById('lscroll').appendChild(div);requestAnimationFrame(()=>div.classList.add('show'));
-}
-function makeRDay(d,pkgs){
-  const div=document.createElement('div');div.className='drow';div.id=`rd${d}`;
-  div.innerHTML=`<div class="dname">${DAY_NAMES[d]} · +${pkgs} paquetes</div><div class="parea" id="rp${d}"><div class="plabel" id="rpl${d}">en cola</div></div><div class="t-track" id="rt${d}" style="margin-top:5px"></div>`;
-  document.getElementById('rscroll').appendChild(div);requestAnimationFrame(()=>div.classList.add('show'));
-}
-function addDots(d,count){
-  const area=document.getElementById(`rp${d}`);if(!area)return;
-  for(let i=0;i<count;i++){const dot=document.createElement('span');dot.className='pdot';dot.textContent='📦';area.appendChild(dot);R.dots.push(dot);setTimeout(()=>{dot.offsetHeight;dot.classList.add('show');},i*45);}
-}
-function clearDots(){R.dots.forEach(d=>{d.classList.remove('show');d.classList.add('gone');});R.dots=[];}
-function updateStreak(){const s=L.co2-R.co2;if(s<=0)return;const el=document.getElementById('streak');el.textContent=`🌿 CO₂ ahorrado: ${s} kg`;el.classList.add('show');}
-
-function stepDay(d){
-  const pkgs=DAILY_PKGS[d];
-  document.getElementById('dpill').textContent=`DÍA ${d+1} / ${DAYS}`;
-  const isLast=d===DAYS-1;
-  // LEFT
-  makeLDay(d,pkgs);
-  setTimeout(()=>{
-    makeTruck(`lt${d}`,pkgs,'l');
-    L.t++;L.co2+=CO2_TRUCK;L.cost+=COST_TRUCK;
-    liveL.routes.push(L.t);liveL.co2.push(L.co2);liveL.cost.push(L.cost);
-    animNum('lt',L.t);animNum('lc',L.co2,' kg');
-    scrollB('lscroll');updateStreak();
-    if(document.getElementById('page-biz').classList.contains('active'))refreshBizCharts();
-  },300);
-  // RIGHT
-  makeRDay(d,pkgs);
-  R.pending+=pkgs;
-  setTimeout(()=>{
-    addDots(d,pkgs);
-    const fire=R.pending>=THRESHOLD||isLast;
-    if(fire){
-      const batch=R.pending;const nT=Math.ceil(batch/TRUCK_CAP);R.pending=0;
-      setTimeout(()=>{
-        clearDots();
-        const lbl=document.getElementById(`rpl${d}`);if(lbl)lbl.textContent=`🚀 Enviando ${batch} paquetes juntos`;
-        for(let t=0;t<nT;t++){const cnt=t<nT-1?TRUCK_CAP:batch-t*TRUCK_CAP;setTimeout(()=>{
-          makeTruck(`rt${d}`,cnt,'r');
-          R.t++;R.co2+=CO2_TRUCK;R.cost+=COST_TRUCK;
-          // pad live arrays to same length as L
-          while(liveR.routes.length<liveL.routes.length-1){liveR.routes.push(R.t);liveR.co2.push(R.co2);liveR.cost.push(R.cost);}
-          liveR.routes.push(R.t);liveR.co2.push(R.co2);liveR.cost.push(R.cost);
-          animNum('rt',R.t);animNum('rc',R.co2,' kg');
-          updateStreak();
-          if(document.getElementById('page-biz').classList.contains('active'))refreshBizCharts();
-        },t*320);}
-        scrollB('rscroll');
-        if(isLast)setTimeout(showFinal,nT*320+1200);
-      },600);
-    } else {
-      const lbl=document.getElementById(`rpl${d}`);if(lbl)lbl.textContent=`⏳ Acumulando… ${R.pending} en cola`;
-      // pad right with current value
-      liveR.routes.push(R.t);liveR.co2.push(R.co2);liveR.cost.push(R.cost);
-      scrollB('rscroll');
-      if(isLast)setTimeout(showFinal,1200);
-    }
-  },500);
-}
-
-function showFinal(){
-  const sT=L.t-R.t,sCO2=L.co2-R.co2,pct=Math.round(sCO2/L.co2*100);
-  document.getElementById('fn1').textContent=sT;
-  document.getElementById('fn1s').textContent=`−${Math.round(sT/L.t*100)}% de rutas en la calle`;
-  document.getElementById('fn2').textContent=sCO2+' kg';
-  document.getElementById('fn2s').textContent=`de ${L.co2} kg sin EnvíoEco`;
-  document.getElementById('fn3').textContent=pct+'%';
-  const trees=Math.round(sCO2/21),km=Math.round(sCO2/0.12);
-  document.getElementById('fequiv').innerHTML=`<strong>${sCO2} kg CO₂ evitados</strong> = plantar <strong>${trees} árboles</strong> o no conducir <strong>${km.toLocaleString('es-ES')} km</strong> — solo en una semana y una zona.`;
-  document.getElementById('streak').classList.remove('show');
-  document.getElementById('fover').classList.add('show');
-}
-
-function startSim(){
-  if(running)return;running=true;
-  document.getElementById('bplay').disabled=true;
-  function next(){if(curDay>=DAYS)return;stepDay(curDay++);if(curDay<DAYS)timer=setTimeout(next,STEP_MS);}
-  next();
-}
-function resetSim(){
-  clearTimeout(timer);running=false;curDay=0;
-  L.t=0;L.co2=0;L.cost=0;R.t=0;R.co2=0;R.cost=0;R.pending=0;R.dots=[];
-  liveL.routes.length=0;liveL.co2.length=0;liveL.cost.length=0;
-  liveR.routes.length=0;liveR.co2.length=0;liveR.cost.length=0;
-  document.getElementById('lscroll').innerHTML='';
-  document.getElementById('rscroll').innerHTML='';
-  document.getElementById('bplay').disabled=false;
-  document.getElementById('dpill').textContent='DÍA 0 / 7';
-  document.getElementById('streak').classList.remove('show');
-  document.getElementById('fover').classList.remove('show');
-  ['lt','rt'].forEach(id=>document.getElementById(id).textContent='0');
-  ['lc','rc'].forEach(id=>document.getElementById(id).textContent='0 kg');
-  buildBizPage('week');
-}
-
-/* ═══════════════════════════════════════════
-   TABS
-═══════════════════════════════════════════ */
-function switchTab(t){
-  document.querySelectorAll('.tab').forEach(el=>el.classList.remove('active'));
-  document.querySelectorAll('.page').forEach(el=>el.classList.remove('active'));
-  document.querySelector(`.${t}-tab`).classList.add('active');
-  document.getElementById(`page-${t}`).classList.add('active');
-  if(t==='biz') buildBizPage(currentScenario);
-}
 
 /* ═══════════════════════════════════════════
    BUSINESS PAGE
@@ -626,20 +330,6 @@ function buildBizPage(key){
     </tr>`).join('');
 
   drawCharts(s);
-}
-
-function refreshBizCharts(){
-  // Update with live sim data if on biz page and sim has run some days
-  if(!liveL.routes.length) return;
-  const s=SCENARIOS['week'];
-  // override co2 and cost series with live data
-  const liveSc={...s,
-    co2ByDayL:liveL.co2,co2ByDayR:liveR.co2,
-    costByDayL:liveL.cost,costByDayR:liveR.cost,
-    days:DAY_NAMES.slice(0,liveL.co2.length).map(d=>d.split(' ')[0]),
-    routesL:L.t,routesR:R.t,co2L:L.co2,co2R:R.co2,costL:L.cost,costR:R.cost,
-  };
-  drawCharts(liveSc);
 }
 
 const CHART_DEFAULTS={
