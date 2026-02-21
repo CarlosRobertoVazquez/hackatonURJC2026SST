@@ -61,8 +61,11 @@ header nav a {
 }
 
 /* HERO SECTION */
+.hero-bg {
+    background: url('fondo.jpg') center/cover no-repeat;
+}
+
 .hero {
-    background: url('https://via.placeholder.com/1600x450') center/cover no-repeat;
     padding: 80px 0;
     text-align: center;
     color: #fff;
@@ -112,6 +115,7 @@ header nav a {
     position: relative;
     z-index: 10;
     gap: 20px;
+    padding-bottom: 40px;
 }
 
 .card {
@@ -134,7 +138,7 @@ header nav a {
 
 /* NEWS SECTION */
 .news-section {
-    margin-top: 80px;
+    margin-top: 0;
     padding: 40px;
     background: #ffe680;
     text-align: center;

@@ -11,8 +11,8 @@
   --red:#D40511;--yellow:#FFCC00;
   --green:#2e7d32;--green2:#4caf50;--green3:#a5d6a7;
   --blue:#1565c0;--blue2:#42a5f5;
-  --dark:#080808;--panel:#101010;--panel2:#131313;--border:#1e1e1e;
-  --txt:#f0f0f0;--muted:#555;--muted2:#888;
+  --dark:#ffffff;--panel:#f5f5f5;--panel2:#efefef;--border:#d0d0d0;
+  --txt:#111111;--muted:#777;--muted2:#555;
 }
 *{box-sizing:border-box;margin:0;padding:0;}
 html,body{width:100%;height:100%;overflow:hidden;}
@@ -28,8 +28,8 @@ body{background:var(--dark);color:var(--txt);font-family:'DM Sans',sans-serif;di
 .btn-play{background:var(--red);color:#fff;border:none;cursor:pointer;font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:1px;padding:8px 24px;border-radius:6px;transition:opacity .2s;}
 .btn-play:hover:not(:disabled){opacity:.85;}
 .btn-play:disabled{opacity:.4;cursor:default;}
-.btn-sm{background:transparent;color:#555;border:1.5px solid #444;cursor:pointer;font-size:11px;font-weight:700;padding:7px 13px;border-radius:6px;transition:all .2s;}
-.btn-sm:hover{color:#fff;border-color:#fff;}
+.btn-sm{background:transparent;color:#555;border:1.5px solid #888;cursor:pointer;font-size:11px;font-weight:700;padding:7px 13px;border-radius:6px;transition:all .2s;}
+.btn-sm:hover{color:#111;border-color:#111;}
 
 /* ── TABS ── */
 .tabs{display:flex;flex-shrink:0;border-bottom:2px solid var(--border);}
@@ -74,13 +74,13 @@ body{background:var(--dark);color:var(--txt);font-family:'DM Sans',sans-serif;di
 .tlabel{font-size:9px;font-weight:700;}
 .tlabel.rl{color:var(--red);}
 .tlabel.gl{color:var(--green2);}
-.parea{background:#0e0e0e;border:1px dashed #222;border-radius:7px;padding:6px 9px;min-height:34px;display:flex;flex-wrap:wrap;gap:3px;align-items:center;}
-.plabel{font-size:9px;font-weight:800;letter-spacing:.3px;text-transform:uppercase;color:#2a2a2a;width:100%;margin-bottom:3px;}
+.parea{background:#ececec;border:1px dashed #bbb;border-radius:7px;padding:6px 9px;min-height:34px;display:flex;flex-wrap:wrap;gap:3px;align-items:center;}
+.plabel{font-size:9px;font-weight:800;letter-spacing:.3px;text-transform:uppercase;color:#777;width:100%;margin-bottom:3px;}
 .pdot{font-size:13px;opacity:0;transition:opacity .2s,transform .2s;transform:scale(.3);}
 .pdot.show{opacity:1;transform:scale(1);}
 .pdot.gone{opacity:.1;transform:scale(.8);}
 /* bottom bar */
-.bbar{grid-column:1/-1;border-top:1px solid var(--border);background:#0b0b0b;padding:11px 18px;display:grid;grid-template-columns:1fr 1fr;gap:12px;flex-shrink:0;}
+.bbar{grid-column:1/-1;border-top:1px solid var(--border);background:#f8f8f8;padding:11px 18px;display:grid;grid-template-columns:1fr 1fr;gap:12px;flex-shrink:0;}
 .mgroup{display:flex;gap:9px;}
 .metric{flex:1;background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:8px 11px;position:relative;overflow:hidden;}
 .ml{font-size:9px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);}
@@ -92,7 +92,7 @@ body{background:var(--dark);color:var(--txt);font-family:'DM Sans',sans-serif;di
 .mfill.rf{background:var(--red);}
 .mfill.gf{background:var(--green2);}
 /* streak */
-.streak{position:fixed;top:60px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.9);border:1px solid var(--green);border-radius:30px;padding:5px 18px;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1px;color:var(--green2);white-space:nowrap;opacity:0;transition:opacity .3s;z-index:50;pointer-events:none;}
+.streak{position:fixed;top:60px;left:50%;transform:translateX(-50%);background:rgba(255,255,255,.95);border:1px solid var(--green);border-radius:30px;padding:5px 18px;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1px;color:var(--green);white-space:nowrap;opacity:0;transition:opacity .3s;z-index:50;pointer-events:none;box-shadow:0 2px 8px rgba(0,0,0,.15);}
 .streak.show{opacity:1;}
 /* eco final overlay */
 .fover{position:fixed;inset:0;background:rgba(0,0,0,.93);display:none;align-items:center;justify-content:center;z-index:100;cursor:pointer;}
@@ -149,8 +149,8 @@ body{background:var(--dark);color:var(--txt);font-family:'DM Sans',sans-serif;di
 /* ROI table */
 .roi-table{width:100%;border-collapse:collapse;font-size:11px;margin-top:6px;}
 .roi-table thead th{padding:7px 10px;text-align:left;font-size:9px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--border);}
-.roi-table tbody td{padding:8px 10px;border-bottom:1px solid #141414;color:var(--txt);}
-.roi-table tbody tr:hover{background:#141414;}
+.roi-table tbody td{padding:8px 10px;border-bottom:1px solid #e0e0e0;color:var(--txt);}
+.roi-table tbody tr:hover{background:#f0f0f0;}
 .roi-table .good{color:var(--green2);font-weight:800;}
 .roi-table .bad{color:var(--red);font-weight:700;}
 .roi-table .neutral{color:var(--yellow);font-weight:700;}
@@ -184,7 +184,7 @@ body{background:var(--dark);color:var(--txt);font-family:'DM Sans',sans-serif;di
 <!-- TABS -->
 <div class="tabs">
   <div class="tab eco-tab active" onclick="switchTab('eco')">🌿 Impacto Medioambiental</div>
-  <div class="tab biz-tab" onclick="switchTab('biz')">📊 Análisis de Negocio</div>
+  <div class="tab biz-tab" onclick="switchTab('biz')">📊 Impacto económico</div>
 </div>
 
 <!-- ══ ECO PAGE ══ -->
@@ -250,9 +250,9 @@ body{background:var(--dark);color:var(--txt);font-family:'DM Sans',sans-serif;di
     <!-- Scenario selector -->
     <div class="scenario-bar">
       <label>Escenario:</label>
-      <button class="scen-btn active" onclick="setScenario('week',this)">1 semana · 1 zona</button>
-      <button class="scen-btn" onclick="setScenario('month',this)">1 mes · 1 zona</button>
-      <button class="scen-btn" onclick="setScenario('year',this)">1 año · España</button>
+      <button class="scen-btn active" onclick="setScenario('week',this)">1 semana</button>
+      <button class="scen-btn" onclick="setScenario('month',this)">1 mes</button>
+      <button class="scen-btn" onclick="setScenario('year',this)">1 año</button>
     </div>
 
     <!-- KPIs -->
@@ -338,6 +338,7 @@ body{background:var(--dark);color:var(--txt);font-family:'DM Sans',sans-serif;di
 </div>
 
 <!-- Streak & Eco final overlay -->
+<script src="dashboard-stats.js"></script>
 <div class="streak" id="streak">🌿 CO₂ ahorrado: 0 kg</div>
 <div class="fover" id="fover" onclick="this.classList.remove('show')">
   <div class="fcard">
@@ -498,33 +499,77 @@ function switchTab(t){
 let currentScenario='week';
 let charts={};
 
+// ── Build SCENARIOS from real dashboard-stats.js data (con histórico) ──
+const _wk=DASHBOARD_STATS;
+const _wkDays=7;
+const _wkCo2L=_wk.graficos.emisionesDiarias.acumuladoActual.slice(-1)[0]; // 84
+const _wkCo2R=_wk.graficos.emisionesDiarias.acumuladoEco.slice(-1)[0];    // 36
+const _wkCostL=_wk.kpis.costeActual;  // 420
+const _wkCostR=_wk.kpis.costeEco;     // 163.8
+
+// Proyecciones reales del algoritmo
+const _hM=_wk.historicoProyecciones.find(h=>h.periodo==='1 Mes');
+const _hY=_wk.historicoProyecciones.find(h=>h.periodo==='1 Año');
+
+// Mes: coste total derivado del ritmo diario real + ahorro real del algoritmo
+const _mCostL=Math.round((_wkCostL/_wkDays)*_hM.dias);          // 1800
+const _mCostR=Math.round(_mCostL-_hM.ahorroEuros);               // 702
+const _mCo2L =Math.round((_wkCo2L/_wkDays)*_hM.dias);           // 360
+const _mCo2R =Math.round(_mCo2L-_hM.co2EvitadoKg);              // 206
+const _mRoutesL=Math.round((_wk.graficos.rutasLanzadas.sinEco/_wkDays)*_hM.dias); // 30
+const _mRoutesR=Math.round((_wk.graficos.rutasLanzadas.conEco/_wkDays)*_hM.dias); // 13
+
+// Año: ídem con datos reales anuales del algoritmo
+const _yCostL=Math.round((_wkCostL/_wkDays)*_hY.dias);           // 21900
+const _yCostR=Math.round(_yCostL-_hY.ahorroEuros);               // 8895
+const _yCo2L =Math.round((_wkCo2L/_wkDays)*_hY.dias);           // 4380
+const _yCo2R =Math.round(_yCo2L-_hY.co2EvitadoKg);              // 2393
+const _yRoutesL=Math.round((_wk.graficos.rutasLanzadas.sinEco/_wkDays)*_hY.dias); // 365
+const _yRoutesR=Math.round((_wk.graficos.rutasLanzadas.conEco/_wkDays)*_hY.dias); // 157
+
 const SCENARIOS={
   week:{
-    label:'1 semana · 1 zona',mult:1,
-    routesL:7,routesR:3,co2L:84,co2R:36,costL:420,costR:180,fillL:20,fillR:72,
-    days:['L','M','X','J','V','S','D'],
-    co2ByDayL:[12,24,36,48,60,72,84],
-    co2ByDayR:[0,0,12,12,12,24,36],
-    costByDayL:[60,120,180,240,300,360,420],
-    costByDayR:[0,0,60,60,60,120,180],
+    label:'1 semana · 1 zona', mult:1,
+    paquetes:_wk.historicoProyecciones.find(h=>h.periodo==='1 Semana').paquetesOptimizados,
+    routesL:_wk.graficos.rutasLanzadas.sinEco,
+    routesR:_wk.graficos.rutasLanzadas.conEco,
+    co2L:_wkCo2L, co2R:_wkCo2R,
+    costL:_wkCostL, costR:_wkCostR,
+    fillL:_wk.kpis.porcentajeOcupacionSinEco,
+    fillR:_wk.kpis.porcentajeOcupacionConEco,
+    days:_wk.graficos.emisionesDiarias.dias,
+    co2ByDayL:_wk.graficos.emisionesDiarias.acumuladoActual,
+    co2ByDayR:_wk.graficos.emisionesDiarias.acumuladoEco,
+    costByDayL:_wk.graficos.costeDiario.acumuladoActual,
+    costByDayR:_wk.graficos.costeDiario.acumuladoEco,
   },
   month:{
-    label:'1 mes · 1 zona',mult:4,
-    routesL:28,routesR:10,co2L:336,co2R:120,costL:1680,costR:600,fillL:20,fillR:75,
+    label:'1 mes · 1 zona', mult:_hM.dias/_wkDays,
+    paquetes:_hM.paquetesOptimizados,
+    routesL:_mRoutesL, routesR:_mRoutesR,
+    co2L:_mCo2L, co2R:_mCo2R,
+    costL:_mCostL, costR:_mCostR,
+    fillL:_wk.kpis.porcentajeOcupacionSinEco,
+    fillR:_wk.kpis.porcentajeOcupacionConEco,
     days:['S1','S2','S3','S4'],
-    co2ByDayL:[84,168,252,336],
-    co2ByDayR:[36,72,96,120],
-    costByDayL:[420,840,1260,1680],
-    costByDayR:[180,360,480,600],
+    co2ByDayL:[_mCo2L/4,_mCo2L/2,_mCo2L*3/4,_mCo2L].map(Math.round),
+    co2ByDayR:[_mCo2R/4,_mCo2R/2,_mCo2R*3/4,_mCo2R].map(Math.round),
+    costByDayL:[_mCostL/4,_mCostL/2,_mCostL*3/4,_mCostL].map(Math.round),
+    costByDayR:[_mCostR/4,_mCostR/2,_mCostR*3/4,_mCostR].map(Math.round),
   },
   year:{
-    label:'1 año · España (950 zonas)',mult:950*52,
-    routesL:345800,routesR:127400,co2L:4149600,co2R:1528800,costL:20748000,costR:7644000,fillL:20,fillR:74,
+    label:'1 año · 1 zona', mult:_hY.dias/_wkDays,
+    paquetes:_hY.paquetesOptimizados,
+    routesL:_yRoutesL, routesR:_yRoutesR,
+    co2L:_yCo2L, co2R:_yCo2R,
+    costL:_yCostL, costR:_yCostR,
+    fillL:_wk.kpis.porcentajeOcupacionSinEco,
+    fillR:_wk.kpis.porcentajeOcupacionConEco,
     days:['T1','T2','T3','T4'],
-    co2ByDayL:[1037400,2074800,3112200,4149600],
-    co2ByDayR:[382200,764400,1146600,1528800],
-    costByDayL:[5187000,10374000,15561000,20748000],
-    costByDayR:[1911000,3822000,5733000,7644000],
+    co2ByDayL:[_yCo2L/4,_yCo2L/2,_yCo2L*3/4,_yCo2L].map(Math.round),
+    co2ByDayR:[_yCo2R/4,_yCo2R/2,_yCo2R*3/4,_yCo2R].map(Math.round),
+    costByDayL:[_yCostL/4,_yCostL/2,_yCostL*3/4,_yCostL].map(Math.round),
+    costByDayR:[_yCostR/4,_yCostR/2,_yCostR*3/4,_yCostR].map(Math.round),
   }
 };
 
@@ -555,29 +600,29 @@ function buildBizPage(key){
   document.getElementById('kpi-cost-after-sub').textContent=`${fmt(s.routesR)} rutas × 60€`;
   document.getElementById('kpi-cost-delta').textContent=`▼ −${savingPct}% de coste`;
   document.getElementById('kpi-saving').textContent=fmt(saving)+'€';
-  document.getElementById('kpi-saving-sub').textContent=s.label;
+  document.getElementById('kpi-saving-sub').textContent=`${s.label} · ${s.paquetes} paquetes optimizados`;
   document.getElementById('kpi-co2').textContent=fmt(co2Saved)+' kg';
   document.getElementById('kpi-co2-sub').textContent=`≈ ${co2Pct}% menos emisiones`;
   document.getElementById('kpi-fill').textContent=s.fillR+'%';
   document.getElementById('kpi-fill-sub').textContent=`vs ${s.fillL}% sin algoritmo`;
 
-  // ROI table
-  const zones=[
-    {zona:'28931 Móstoles',rAh:4,eur:240,co2:48,roi:'high'},
-    {zona:'28001 Madrid',  rAh:11,eur:660,co2:132,roi:'high'},
-    {zona:'08001 Barcelona',rAh:9,eur:540,co2:108,roi:'high'},
-    {zona:'41001 Sevilla', rAh:6,eur:360,co2:72, roi:'mid'},
-    {zona:'46001 Valencia',rAh:7,eur:420,co2:84, roi:'high'},
-    {zona:'48001 Bilbao',  rAh:3,eur:180,co2:36, roi:'mid'},
-  ].map(z=>({...z,eur:z.eur*s.mult/4,co2:z.co2*s.mult/4,rAh:z.rAh*s.mult/4}));
+  // ROI table — real data for week, scaled for month/year
+  const _roi=DASHBOARD_STATS.tablaRoi;
+  const zones=_roi.map(z=>({
+    zona:z.zona,
+    rAh:z.rutasAhorradas*s.mult,
+    eur:z.ahorroEuros*s.mult,
+    co2:Math.abs(z.co2Evitado)*s.mult,
+    roi:z.roi
+  }));
 
   document.getElementById('roi-tbody').innerHTML=zones.map(z=>`
     <tr>
       <td>${z.zona}</td>
-      <td class="${z.roi==='high'?'good':'neutral'}">${fmt(z.rAh)} menos</td>
+      <td class="${z.roi==='Alto'?'good':'neutral'}">${fmt(z.rAh)} menos</td>
       <td class="good">+${fmt(z.eur)}€</td>
       <td class="good">−${fmt(z.co2)} kg</td>
-      <td class="${z.roi==='high'?'good':'neutral'}">${z.roi==='high'?'⭐ Alto':'✓ Medio'}</td>
+      <td class="${z.roi==='Alto'?'good':'neutral'}">${z.roi==='Alto'?'⭐ Alto':'✓ Medio'}</td>
     </tr>`).join('');
 
   drawCharts(s);
@@ -598,10 +643,10 @@ function refreshBizCharts(){
 }
 
 const CHART_DEFAULTS={
-  plugins:{legend:{labels:{color:'#888',font:{family:'DM Sans',size:10}}}},
+  plugins:{legend:{labels:{color:'#555',font:{family:'DM Sans',size:10}}}},
   scales:{
-    x:{grid:{color:'#1a1a1a'},ticks:{color:'#555',font:{size:9}}},
-    y:{grid:{color:'#1a1a1a'},ticks:{color:'#555',font:{size:9}}}
+    x:{grid:{color:'#e0e0e0'},ticks:{color:'#777',font:{size:9}}},
+    y:{grid:{color:'#e0e0e0'},ticks:{color:'#777',font:{size:9}}}
   }
 };
 
@@ -642,7 +687,7 @@ function drawCharts(s){
       ]
     },
     options:{...CHART_DEFAULTS,responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{labels:{color:'#888',font:{size:10}}}}
+      plugins:{legend:{labels:{color:'#555',font:{size:10}}}}
     }
   });
 
@@ -662,7 +707,7 @@ function drawCharts(s){
     },
     options:{responsive:true,maintainAspectRatio:false,cutout:'65%',
       plugins:{
-        legend:{position:'bottom',labels:{color:'#777',font:{size:9},boxWidth:10}},
+        legend:{position:'bottom',labels:{color:'#555',font:{size:9},boxWidth:10}},
         tooltip:{callbacks:{label:ctx=>`${fmt(ctx.raw)}€ (${Math.round(ctx.raw/s.costL*100)}%)`}}
       }
     }
@@ -680,7 +725,7 @@ function drawCharts(s){
       ]
     },
     options:{...CHART_DEFAULTS,responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{labels:{color:'#888',font:{size:10}}},
+      plugins:{legend:{labels:{color:'#555',font:{size:10}}},
         tooltip:{callbacks:{label:ctx=>`${fmt(ctx.raw)}€`}}
       }
     }

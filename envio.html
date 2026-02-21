@@ -9,6 +9,8 @@
   <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
   <!-- Resultados pre-generados por el algoritmo Java -->
   <script src="eco-resultados.js"></script>
+  <!-- Salida del optimizador (ubicaciones + fechas con EcoPoints) -->
+  <script src="eco-opciones.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;600;800;900&display=swap" rel="stylesheet"/>
 
   <style>
@@ -336,20 +338,7 @@
 
         <p class="eco-section-title">📍 Selecciona un punto de recogida</p>
         <div class="loc-list" id="loc-list">
-          <!-- Domicilio -->
-          <div class="loc-row no-eco" data-eco="false" data-dist="0"
-               data-loc-label="Tu casa (C/ Portillo, 42)" onclick="selectLoc(this)">
-            <div class="loc-row-icon">🏠</div>
-            <div class="loc-row-info">
-              <div class="loc-row-name">Tu casa</div>
-              <div class="loc-row-addr">C/ Portillo, 42 – Piso 3º B</div>
-            </div>
-            <div class="loc-row-right">
-              <span class="loc-type-badge">Domicilio</span>
-              <span class="loc-pts-pill none">Sin EcoPoints</span>
-            </div>
-          </div>
-          <!-- Puntos del algoritmo -->
+          <!-- Filas generadas dinámicamente desde ECO_OPCIONES -->
           <div id="loc-rows-algo"></div>
         </div>
 
@@ -498,31 +487,61 @@
   <script>
     const R = ECO_RESULTADOS;
 
-    // ── Construir filas de ubicación desde maximosPorUbicacion ──
+    // ── Metadatos de icono/tipo para cada ubicación conocida ──
+    const LOC_META = {
+      'Domicilio':           { icono:'🏠', tipo:'Domicilio',            dist:0   },
+      'Punto Alternativo 1': { icono:'🏪', tipo:'Tienda colaboradora',  dist:1.8 },
+      'Punto Alternativo 2': { icono:'📮', tipo:'Punto de conveniencia',dist:2.9 },
+      'Punto Alternativo 3': { icono:'📦', tipo:'Casillero 24h',         dist:4.1 },
+    };
+
+    // ── Formatea fecha ISO "2026-02-21" → "Sáb 21 feb" ──
+    function formatFecha(iso) {
+      const d = new Date(iso + 'T12:00:00');
+      const dias  = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+      const meses = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+      return `${dias[d.getDay()]} ${d.getDate()} ${meses[d.getMonth()]}`;
+    }
+
+    // ── Construir filas de ubicación desde ECO_OPCIONES.ubicacionesTopPuntos ──
     (function () {
       const container = document.getElementById('loc-rows-algo');
-      const maxGlobal = Math.max(...R.maximosPorUbicacion.map(p => p.maxPts));
+      const data      = ECO_OPCIONES.ubicacionesTopPuntos;
+      const maxGlobal = Math.max(...Object.values(data));
 
-      R.maximosPorUbicacion.forEach(p => {
-        const isBest = p.maxPts === maxGlobal;
+      // Ordenar: más puntos primero (excluir Domicilio al final)
+      const entries = Object.entries(data).sort((a, b) => {
+        if (a[0] === 'Domicilio') return 1;
+        if (b[0] === 'Domicilio') return -1;
+        return b[1] - a[1];
+      });
+
+      entries.forEach(([nombre, maxPts]) => {
+        const meta    = LOC_META[nombre] || { icono:'📍', tipo:'Punto Eco', dist:0 };
+        const isBest  = maxPts === maxGlobal;
+        const isHome  = nombre === 'Domicilio';
+        const dispNom = isHome ? 'Tu casa' : nombre;
+        const dispAddr = isHome
+          ? `${meta.tipo} · C/ Portillo, 42`
+          : `${meta.tipo} · ${meta.dist} km de tu casa`;
         const pill = isBest
-          ? `<span class="loc-pts-pill best">⭐ hasta +${p.maxPts} pts</span>`
-          : `<span class="loc-pts-pill green">hasta +${p.maxPts} pts</span>`;
+          ? `<span class="loc-pts-pill best">⭐ hasta +${maxPts} pts</span>`
+          : `<span class="loc-pts-pill green">hasta +${maxPts} pts</span>`;
 
         const row = document.createElement('div');
-        row.className = 'loc-row';
+        row.className        = 'loc-row';
         row.dataset.eco      = 'true';
-        row.dataset.dist     = p.dist;
-        row.dataset.nombre   = p.nombre;
-        row.dataset.locLabel = p.nombre;
+        row.dataset.dist     = meta.dist;
+        row.dataset.nombre   = nombre;
+        row.dataset.locLabel = isHome ? `Tu casa (C/ Portillo, 42)` : nombre;
         row.innerHTML = `
-          <div class="loc-row-icon">${p.icono}</div>
+          <div class="loc-row-icon">${meta.icono}</div>
           <div class="loc-row-info">
-            <div class="loc-row-name">${p.nombre}</div>
-            <div class="loc-row-addr">${p.tipo} · ${p.dist} km de tu casa</div>
+            <div class="loc-row-name">${dispNom}</div>
+            <div class="loc-row-addr">${dispAddr}</div>
           </div>
           <div class="loc-row-right">
-            <span class="loc-type-badge">${p.tipo}</span>
+            <span class="loc-type-badge">${meta.tipo}</span>
             ${pill}
           </div>`;
         row.addEventListener('click', () => selectLoc(row));
@@ -580,27 +599,31 @@
       updateLiveBar();
     }
 
-    // ── Date cards ────────────────────────────────────────────
+    // ── Date cards ─────────────────────────────────────────────
+    // Usa ECO_OPCIONES.fechasPorUbicacion (campo "puntos", fecha ISO)
     function buildDateCards() {
       const container = document.getElementById('date-options');
       container.innerHTML = '';
       container.classList.toggle('disabled', !selEco);
       if (!selEco || !selNombre) return;
 
-      const opcionesPunto = R.fechasPorUbicacion[selNombre] || [];
-      const maxPts = Math.max(...opcionesPunto.map(o => o.pts));
+      const opcionesPunto = ECO_OPCIONES.fechasPorUbicacion[selNombre] || [];
+      if (!opcionesPunto.length) return;
+      const maxPts = Math.max(...opcionesPunto.map(o => o.puntos));
 
       opcionesPunto.forEach(op => {
-        const isBest = op.pts === maxPts;
+        const isBest    = op.puntos === maxPts;
+        const fechaStr  = formatFecha(op.fecha);
+        const [day, ...rest] = fechaStr.split(' ');
+        const delayTxt  = op.diasRetraso === 0 ? 'Hoy' : `+${op.diasRetraso} día${op.diasRetraso > 1 ? 's' : ''}`;
         const div = document.createElement('div');
         div.className = 'date-opt' + (isBest ? ' best-combo' : '');
         div.innerHTML = `
           ${isBest ? '<span class="best-tag">⭐ Máximo</span>' : ''}
-          <div class="dopt-day">${op.fecha.split(' ')[0]}</div>
-          <div class="dopt-date">${op.fecha.split(' ').slice(1).join(' ')}</div>
-          <div class="dopt-delay">+${op.diasRetraso} día${op.diasRetraso>1?'s':''}</div>
-          <span class="dopt-pts">+${op.pts} pts</span>
-          <span class="dopt-co2">📦 ${op.paquetesAgrupados} paquetes agrupados</span>
+          <div class="dopt-day">${day}</div>
+          <div class="dopt-date">${rest.join(' ')}</div>
+          <div class="dopt-delay">${delayTxt}</div>
+          <span class="dopt-pts">+${op.puntos} pts</span>
         `;
         div.addEventListener('click', () => selectDate(div, op));
         container.appendChild(div);
@@ -608,31 +631,29 @@
     }
 
     // ── Date select ───────────────────────────────────────────
+    // op tiene los campos del nuevo formato: { fecha (ISO), diasRetraso, puntos }
     function selectDate(el, op) {
       document.querySelectorAll('.date-opt').forEach(o => o.classList.remove('selected'));
       el.classList.add('selected');
-      selDays = op.diasRetraso; selOp = op;
+      selDays = op.diasRetraso;
+      selOp   = op;
+      selOp._fechaStr = formatFecha(op.fecha); // guarda la fecha formateada
 
-      // Desglose nuevo: ahorroNeto = ahorroBrutoGasolina - costoAlmacenaje
-      document.getElementById('bd-gasolina').textContent   = '+'+op.ahorroBrutoGasolina.toFixed(2)+'€';
-      document.getElementById('bd-dias-label').textContent = op.diasRetraso;
-      document.getElementById('bd-almacenaje').textContent = '−'+(op.costoAlmacenaje).toFixed(2)+'€';
-      document.getElementById('bd-neto').textContent       = op.ahorroNeto.toFixed(2)+'€';
-      document.getElementById('bd-formula').textContent    = 'round('+op.ahorroNeto.toFixed(2)+'×0.5÷0.10)';
-      document.getElementById('bd-total').textContent      = '+'+op.pts+' pts';
-      document.getElementById('pts-breakdown').classList.add('visible');
+      // Ocultar desglose (no disponible en el formato actual del algoritmo)
+      document.getElementById('pts-breakdown').classList.remove('visible');
 
-      // CO2 chip → ahora muestra paquetes agrupados y ahorro neto
+      // CO2 chip
+      const delayTxt = op.diasRetraso === 0 ? 'hoy'
+        : `en ${op.diasRetraso} día${op.diasRetraso > 1 ? 's' : ''}`;
       document.getElementById('co2-chip-text').textContent =
-        `${op.paquetesAgrupados} paquetes agrupados · DHL ahorra ${op.ahorroNeto.toFixed(2)}€ netos`;
+        `Entrega agrupada ${delayTxt} · +${op.puntos} EcoPoints ganados`;
       document.getElementById('co2-chip').classList.add('visible');
 
-      // Barra live: toda la ganancia viene del ahorro neto, no hay split loc/fecha
-      // Mostramos ahorroBruto en "ubicación" y costoAlmacenaje en "fecha" como contexto
+      // Barra live
       const pliLoc  = document.getElementById('pli-loc');
       const pliDate = document.getElementById('pli-date');
-      pliLoc.textContent  = '+'+op.ahorroBrutoGasolina.toFixed(2)+'€ bruto'; pliLoc.classList.add('active');
-      pliDate.textContent = '−'+op.costoAlmacenaje.toFixed(2)+'€ almac.';    pliDate.classList.add('active');
+      pliLoc.textContent  = '✓ elegido'; pliLoc.classList.add('active');
+      pliDate.textContent = '+'+op.puntos+' pts'; pliDate.classList.add('active');
 
       updateLiveBar();
     }
@@ -648,7 +669,7 @@
         hint.textContent='Esta ubicación no genera EcoPoints. Selecciona otro punto.';
         hint.classList.remove('ready'); btn.disabled=true;
       } else if (selOp) {
-        pltEl.textContent='+'+selOp.pts+' pts';
+        pltEl.textContent='+'+selOp.puntos+' pts';
         pltEl.classList.add('has-value','bump');
         setTimeout(()=>pltEl.classList.remove('bump'),300);
         btn.disabled=false;
@@ -688,9 +709,9 @@
       document.getElementById('btn-confirm').style.display='none';
       document.getElementById('eco-confirm-hint').style.display='none';
 
-      document.getElementById('activated-date').textContent      = selOp.fecha;
+      document.getElementById('activated-date').textContent      = selOp._fechaStr;
       document.getElementById('activated-loc-label').textContent = selLocLabel;
-      document.getElementById('activated-pts').textContent       = `+${selOp.pts} 🍃 pts`;
+      document.getElementById('activated-pts').textContent       = `+${selOp.puntos} 🍃 pts`;
       document.getElementById('eco-activated').classList.add('visible');
 
       const badge = document.getElementById('badge-servicio');
@@ -698,7 +719,7 @@
       const estado= document.getElementById('estado');
       if (badge)  { badge.textContent='Servicio: EnvíoEco ♻'; badge.style.background='#d9f7be'; badge.style.color='#135200'; }
       if (estado) estado.textContent='En tránsito (modo ecológico)';
-      if (nota)   nota.innerHTML = `Has activado <strong>EnvíoEco</strong>. Entrega el <strong>${selOp.fecha}</strong> en <strong>${selLocLabel}</strong>. Ganarás <strong>+${selOp.pts} EcoPoints</strong> al agrupar <strong>${selOp.paquetesAgrupados} paquetes</strong> (ahorro neto DHL: ${selOp.ahorroNeto.toFixed(2)}€).`;
+      if (nota)   nota.innerHTML = `Has activado <strong>EnvíoEco</strong>. Entrega el <strong>${selOp._fechaStr}</strong> en <strong>${selLocLabel}</strong>. Ganarás <strong>+${selOp.puntos} EcoPoints</strong>.`;
 
       const btnEco = document.getElementById('btn-eco');
       btnEco.textContent='✅ EnvíoEco activado'; btnEco.disabled=true;
@@ -772,7 +793,7 @@
       bar.classList.add('eco');
       animN(co2El, co2Actual, nuevo, 700);
       setBar(nuevo);
-      noteEl.innerHTML = `Has activado <strong>EnvíoEco</strong>. Reducción estimada de emisiones: ~${pct}% gracias a la consolidación de <strong>${selOp.paquetesAgrupados} paquetes</strong> en una misma ruta.`;
+      noteEl.innerHTML = `Has activado <strong>EnvíoEco</strong>. Reducción estimada de emisiones: ~${pct}% gracias a la consolidación de paquetes en una misma ruta.`;
     };
   </script>
 </body>
