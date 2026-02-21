@@ -1,10 +1,10 @@
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
-
+import java.util.Map;
+import java.util.stream.Collectors;
 
 //1. Domicilio del cliente (con su zona postal para asociar rutas futuras)
 class Domicilio {
@@ -76,6 +76,22 @@ class RutaFutura {
     }
     //
 
+}
+
+//6. La recomendación adaptada a ambas opciones (Tiempo y Lugar)
+// 6. La recomendación adaptada a la nueva lógica basada 100% en agrupación
+class RecomendacionUI {
+    PuntoRecogida ubicacion; // Si es null, es "Tu casa"
+    LocalDate fechaEntrega;
+    int totalEcoPuntos; // Puntos únicos basados en el ahorro económico real
+    int paquetesAgrupados; // Útil para mostrar al usuario por qué gana esos puntos
+
+    public RecomendacionUI(PuntoRecogida ubicacion, LocalDate fecha, int totalEcoPuntos, int paquetesAgrupados) {
+        this.ubicacion = ubicacion;
+        this.fechaEntrega = fecha;
+        this.totalEcoPuntos = totalEcoPuntos;
+        this.paquetesAgrupados = paquetesAgrupados;
+    }
 }
 
 
@@ -161,102 +177,80 @@ class GeneradorDatos {
     }
 }
 
-//6. La recomendación adaptada a ambas opciones (Tiempo y Lugar)
-class RecomendacionEco {
-    int diasRetraso;
-    PuntoRecogida nuevoPunto; // Puede ser null si solo retrasa el envío a casa
-    int ecoPuntosOfrecidos;
-    
-    // Métricas para el dashboard de la empresa
-    double ahorroEuros;
-    double ahorroCO2;
-    LocalDate nuevaFecha;
-
-    public RecomendacionEco(int dias, PuntoRecogida punto, int puntos, double euros, double co2, LocalDate fecha) {
-        this.diasRetraso = dias;
-        this.nuevoPunto = punto;
-        this.ecoPuntosOfrecidos = puntos;
-        this.ahorroEuros = euros;
-        this.ahorroCO2 = co2;
-        this.nuevaFecha = fecha;
-    }
-
-    @Override
-    public String toString() {
-        String lugar = (nuevoPunto == null) ? "Domicilio" : nuevoPunto.toString();
-        return String.format("Retraso: %d días | Lugar: %s | Puntos: %d | Ahorro Empresa: %.2f€ | CO2 Evitado: %.2f kg", 
-                             diasRetraso, lugar, ecoPuntosOfrecidos, ahorroEuros, ahorroCO2);
-    }
-}
-
-
 
 // 7. El optimizador que calcula la mejor opción para el cliente y la empresa
-class OptimizadorEcoPuntos {
+//CAMBIO
+class OptimizadorEcoPuntosFinal {
 
-    // Constantes del modelo de negocio
-    private static final double VALOR_PUNTO_EUROS = 0.10; // 1 punto = 10 céntimos
-    private static final double FACTOR_RECOMPENSA_ECONOMICA = 0.40; // Damos el 40% del ahorro económico
-    private static final int PUNTOS_POR_KG_CO2_AHORRADO = 2; // Premio puramente ecológico
+    // --- VARIABLES DE NEGOCIO ---
+    private static final double VALOR_PUNTO_EUROS = 0.10; 
+    private static final double FACTOR_RECOMPENSA = 0.50; // DHL da el 50% del ahorro neto al cliente
     
-    // Compensaciones por molestia al cliente
-    private static final int PUNTOS_POR_DIA_ESPERA = 5; 
-    private static final int PUNTOS_POR_KM_CAMINADO = 10;
+    // --- LÍMITES OPERATIVOS ---
+    private static final double COSTO_ALMACENAJE_DIARIO = 0.15; // € por día que el paquete ocupa espacio
+    private static final int MAX_DIAS_RETRASO = 7; // Ventana máxima operativa (Cross-docking)
 
-    public RecomendacionEco evaluarMejoresOpciones(LocalDate fechaBase, RutaFutura rutaBaseDomicilio, List<RutaFutura> todasLasRutas) {
-        
-        List<RecomendacionEco> opcionesViables = new ArrayList<>();
-        
-        double costoBase = rutaBaseDomicilio.costoPorPaquete();
-        double co2Base = rutaBaseDomicilio.emisionesPorPaquete();
+    public List<RecomendacionUI> calcularOpciones(LocalDate fechaBase, RutaFutura rutaBaseDomicilio, List<RutaFutura> todasLasRutas) {
+        List<RecomendacionUI> opciones = new ArrayList<>();
+        double costoBase = rutaBaseDomicilio.costoPorPaquete(); 
 
-        for (RutaFutura rutaFutura : todasLasRutas) {
-            // Ignoramos la ruta base que ya tiene asignada el cliente
-            if (rutaFutura.idRuta.equals(rutaBaseDomicilio.idRuta)) continue;
+        for (RutaFutura ruta : todasLasRutas) {
+            // 1. Descartar si la furgoneta / locker ya está lleno
+            if (ruta.paquetesActuales >= ruta.capacidadMaxima) continue;
 
-            double ahorroEuros = costoBase - rutaFutura.costoPorPaquete();
-            double ahorroCO2 = co2Base - rutaFutura.emisionesPorPaquete();
+            // 2. Calcular los días de retraso y aplicar el límite operativo (Máx 7 días)
+            int diasRetraso = (int) ChronoUnit.DAYS.between(fechaBase, ruta.fecha);
+            if (diasRetraso < 0 || diasRetraso > MAX_DIAS_RETRASO) continue;
 
-            // Solo nos interesan opciones que realmente ahorren dinero y emisiones
-            if (ahorroEuros > 0 && ahorroCO2 > 0) {
-                
-                int diasRetraso = (int) ChronoUnit.DAYS.between(fechaBase, rutaFutura.fecha);
-                PuntoRecogida punto = rutaFutura.puntoRecogidaAsociado;
-                
-                // 1. Beneficio Económico Compartido
-                int puntosPorAhorro = (int) Math.round((ahorroEuros * FACTOR_RECOMPENSA_ECONOMICA) / VALOR_PUNTO_EUROS);
-                
-                // 2. Beneficio Ecológico
-                int puntosPorCO2 = (int) Math.round(ahorroCO2 * PUNTOS_POR_KG_CO2_AHORRADO);
-                
-                // 3. Compensación por Molestias
-                int puntosPorEspera = diasRetraso * PUNTOS_POR_DIA_ESPERA;
-                int puntosPorCaminar = (punto != null) ? (int) Math.round(punto.distanciaMediaZonaKm * PUNTOS_POR_KM_CAMINADO) : 0;
+            // 3. Calcular el ahorro económico real (Combustible vs. Almacenaje)
+            double costoFuturo = ruta.costoPorPaquete(); 
+            double ahorroBrutoGasolina = costoBase - costoFuturo;
+            double costoAlmacenaje = diasRetraso * COSTO_ALMACENAJE_DIARIO;
+            
+            double ahorroNeto = ahorroBrutoGasolina - costoAlmacenaje;
 
-                // Suma total de puntos a ofrecer
-                int ecoPuntosTotales = puntosPorAhorro + puntosPorCO2 + puntosPorEspera + puntosPorCaminar;
+            // 4. Solo generamos la opción si DHL realmente gana dinero/eficiencia con el cambio
+            if (ahorroNeto > 0) {
+                int ecoPuntos = (int) Math.round((ahorroNeto * FACTOR_RECOMPENSA) / VALOR_PUNTO_EUROS);
 
-                opcionesViables.add(new RecomendacionEco(
-                    diasRetraso, 
-                    punto, 
-                    ecoPuntosTotales, 
-                    ahorroEuros, 
-                    ahorroCO2, 
-                    rutaFutura.fecha
+                // Evitamos dar 0 puntos si el ahorro es minúsculo, estableciendo un mínimo de cortesía si es viable
+                ecoPuntos = Math.max(ecoPuntos, 5); 
+
+                opciones.add(new RecomendacionUI(
+                    ruta.puntoRecogidaAsociado, 
+                    ruta.fecha, 
+                    ecoPuntos, 
+                    ruta.paquetesActuales
                 ));
             }
         }
+        return opciones;
+    }
 
-        if (opcionesViables.isEmpty()) {
-            return null; // No hay ninguna alternativa mejor
-        }
+    // --- MÉTODOS PARA ALIMENTAR LA INTERFAZ WEB ---
 
-        // Devolvemos la opción que le dé más puntos al cliente (suele ser la más eficiente para la empresa también)
-        return opcionesViables.stream()
-                .max(Comparator.comparingInt(r -> r.ecoPuntosOfrecidos))
-                .orElse(null);
+    // Devuelve el top de puntos por ubicación (Para la Vista "Selecciona un punto de recogida")
+    public Map<String, Integer> obtenerMaximosPorUbicacion(List<RecomendacionUI> opciones) {
+        return opciones.stream()
+            .collect(Collectors.toMap(
+                opt -> opt.ubicacion != null ? opt.ubicacion.nombre : "Domicilio",
+                opt -> opt.totalEcoPuntos,
+                Integer::max 
+            ));
+    }
+
+    // Devuelve los días y puntos para una ubicación concreta (Para la Vista "¿Cuándo puedes recibirlo?")
+    public List<RecomendacionUI> obtenerFechasParaUbicacion(List<RecomendacionUI> opciones, String nombreUbicacion) {
+        return opciones.stream()
+            .filter(opt -> {
+                if (nombreUbicacion.equals("Domicilio")) return opt.ubicacion == null;
+                return opt.ubicacion != null && opt.ubicacion.nombre.equals(nombreUbicacion);
+            })
+            .sorted((o1, o2) -> o1.fechaEntrega.compareTo(o2.fechaEntrega))
+            .collect(Collectors.toList());
     }
 }
+// 8. Entorno de pruebas para validar la lógica con datos simulados
 
 // 8. Entorno de pruebas para validar la lógica con datos simulados
 public class EntornoPruebasDHL {
@@ -266,7 +260,7 @@ public class EntornoPruebasDHL {
 
         // 1. Configuración del escenario
         ConfiguracionGeneradorDatos config = new ConfiguracionGeneradorDatos(
-            5, 3, 100, // 5 días, 3 lockers, 100 casas
+            7, 3, 100, // 7 días vista, 3 lockers/tiendas, 100 casas
             120.0, 180.0, 20.0, 45.0, // Domicilio: Caro y Contaminante
             40.0, 80.0, 5.0, 15.0     // Lockers: Barato y Ecológico
         );
@@ -276,7 +270,6 @@ public class EntornoPruebasDHL {
         List<RutaFutura> todasLasRutas = GeneradorDatos.generarRutas(config, hoy, zonaTest, puntos);
 
         // 3. Establecer el "Escenario Base" (Lo que pasaría si el cliente no hace nada)
-        // Buscamos la ruta a domicilio de HOY (Día 0)
         RutaFutura rutaBaseHoy = todasLasRutas.stream()
             .filter(r -> r.fecha.equals(hoy) && r.puntoRecogidaAsociado == null)
             .findFirst()
@@ -287,22 +280,44 @@ public class EntornoPruebasDHL {
         System.out.printf("Costo empresa: %.2f€ | Emisiones: %.2f kg CO2\n\n", 
                           rutaBaseHoy.costoPorPaquete(), rutaBaseHoy.emisionesPorPaquete());
 
-        // 4. Ejecutar el Optimizador
-        OptimizadorEcoPuntos optimizador = new OptimizadorEcoPuntos();
+        // 4. Ejecutar el Optimizador Final
+        OptimizadorEcoPuntosFinal optimizador = new OptimizadorEcoPuntosFinal();
         System.out.println("Buscando alternativas más sostenibles...\n");
-        RecomendacionEco mejorAlternativa = optimizador.evaluarMejoresOpciones(hoy, rutaBaseHoy, todasLasRutas);
+        List<RecomendacionUI> opcionesGeneradas = optimizador.calcularOpciones(hoy, rutaBaseHoy, todasLasRutas);
 
-        // 5. Mostrar Resultados
-        System.out.println("=== PROPUESTA PARA EL CLIENTE EN LA APP ===");
-        if (mejorAlternativa != null) {
-            System.out.println("¡Enhorabuena! Puedes ganar " + mejorAlternativa.ecoPuntosOfrecidos + " Eco Puntos.");
-            System.out.println("Nueva Fecha: " + mejorAlternativa.nuevaFecha + " (+" + mejorAlternativa.diasRetraso + " días)");
-            System.out.println("Lugar de Recogida: " + (mejorAlternativa.nuevoPunto != null ? mejorAlternativa.nuevoPunto.nombre : "Domicilio"));
-            System.out.println("-------------------------------------------");
-            System.out.printf("IMPACTO LOGRADO -> DHL ahorra: %.2f€ y evita %.2f kg de CO2\n", 
-                              mejorAlternativa.ahorroEuros, mejorAlternativa.ahorroCO2);
+        // 5. Mostrar Resultados Simulando la Interfaz (UI)
+        if (opcionesGeneradas.isEmpty()) {
+            System.out.println("Tu envío ya está en la ruta más óptima o no hay opciones rentables. ¡Gracias por confiar en DHL!");
+            return;
+        }
+
+        // --- VISTA 1: SELECCIONA UN PUNTO DE RECOGIDA ---
+        System.out.println("=== VISTA 1: SELECCIONA UN PUNTO DE RECOGIDA ===");
+        Map<String, Integer> maximosPorUbicacion = optimizador.obtenerMaximosPorUbicacion(opcionesGeneradas);
+        
+        // Ordenamos para mostrar primero los que dan más puntos (como en tu mockup)
+        maximosPorUbicacion.entrySet().stream()
+            .sorted(Map.Entry.<String, Integer>comparingByValue().reversed())
+            .forEach(entry -> System.out.println("- " + entry.getKey() + "\t-> hasta +" + entry.getValue() + " pts"));
+
+        // --- VISTA 2: FECHAS DISPONIBLES PARA UNA UBICACIÓN ---
+        // Simulamos que el usuario hace clic en el primer punto de recogida de la lista (si hay)
+        String ubicacionElegida = "Domicilio"; 
+        if (!puntos.isEmpty()) {
+            ubicacionElegida = puntos.get(0).nombre; 
+        }
+
+        System.out.println("\n=== VISTA 2: ¿CUÁNDO PUEDES RECIBIRLO EN '" + ubicacionElegida.toUpperCase() + "'? ===");
+        List<RecomendacionUI> fechasDisponibles = optimizador.obtenerFechasParaUbicacion(opcionesGeneradas, ubicacionElegida);
+        
+        if (fechasDisponibles.isEmpty()) {
+            System.out.println("No hay fechas rentables para esta ubicación.");
         } else {
-            System.out.println("Tu envío ya está en la ruta más óptima. ¡Gracias por confiar en DHL!");
+            fechasDisponibles.forEach(opt -> {
+                long diasDeRetraso = ChronoUnit.DAYS.between(hoy, opt.fechaEntrega);
+                System.out.println("- " + opt.fechaEntrega + " (+" + diasDeRetraso + " días)\t| " 
+                                   + opt.paquetesAgrupados + " paquetes agrupados -> +" + opt.totalEcoPuntos + " pts");
+            });
         }
     }
 }
