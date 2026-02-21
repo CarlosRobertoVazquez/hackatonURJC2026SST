@@ -1,1066 +1,778 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Detalle de envío</title>
-    <link rel="stylesheet" href="styles-envio.css" />
-    <!-- Leaflet CSS -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Detalle de envío – DHL EcoPoints</title>
+  <link rel="stylesheet" href="styles-envio.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
+  <!-- Resultados pre-generados por el algoritmo Java -->
+  <script src="eco-resultados.js"></script>
 
-    <!-- Leaflet JS -->
-    <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
+  <style>
+    .container { max-width:960px; margin:40px auto; padding:0 20px; }
+    .shipment-card {
+      background:#fff; border-radius:10px;
+      box-shadow:0 2px 10px rgba(0,0,0,.08);
+      padding:24px; display:grid; gap:16px;
+    }
+    .shipment-header {
+      display:flex; justify-content:space-between;
+      align-items:center; flex-wrap:wrap; gap:8px 16px;
+    }
+    .badge {
+      display:inline-block; padding:6px 10px; border-radius:999px;
+      font-size:12px; font-weight:700; letter-spacing:.3px;
+      background:#ffe680; color:#7a5a00;
+    }
+    .row { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+    .field { background:#fafafa; border-radius:8px; padding:12px 14px; }
+    .field label { font-size:12px; color:#666; display:block; margin-bottom:6px; }
+    .field div { font-size:16px; font-weight:600; }
+    .actions { display:flex; gap:12px; flex-wrap:wrap; margin-top:6px; }
+    .btn-outline {
+      background:transparent; border:2px solid #d40511; color:#d40511;
+      padding:10px 18px; border-radius:6px; cursor:pointer;
+      font-weight:600; transition:all .2s ease;
+    }
+    .btn-outline:hover { background:#ffd6d8; }
+    .note {
+      font-size:13px; color:#444;
+      background:#fff9d6; border:1px solid #ffe58f;
+      padding:10px 12px; border-radius:6px;
+    }
+    #map { height:350px; width:100%; border-radius:10px;
+           margin-top:15px; box-shadow:0 2px 10px rgba(0,0,0,.15); }
 
-    <style>
-        /* Estilos específicos de esta vista */
-        .container {
-            max-width: 960px;
-            margin: 40px auto;
-            padding: 0 20px;
-        }
+    /* ── Banner del algoritmo ── */
+    .algo-banner {
+      display:none; margin-top:16px; margin-bottom:0;
+      background:linear-gradient(135deg,#1b5e20,#388e3c);
+      border-radius:10px; padding:16px 20px;
+      color:#fff; flex-wrap:wrap; align-items:flex-start;
+      gap:12px; animation:fadeIn .35s ease;
+    }
+    .algo-banner.visible { display:flex; }
+    .algo-banner-label {
+      font-size:11px; font-weight:800; letter-spacing:.6px;
+      text-transform:uppercase; opacity:.65; width:100%; margin-bottom:4px;
+    }
+    .algo-stats-row { display:flex; gap:28px; flex-wrap:wrap; width:100%; }
+    .algo-stat { display:flex; flex-direction:column; gap:1px; }
+    .algo-stat .as-l { font-size:10px; opacity:.65; font-weight:700; letter-spacing:.3px; }
+    .algo-stat .as-v { font-size:20px; font-weight:900; line-height:1.15; }
+    .algo-stat .as-s { font-size:10px; opacity:.55; }
 
-        .shipment-card {
-            background: #fff;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, .08);
-            padding: 24px;
-            display: grid;
-            gap: 16px;
-        }
+    /* ── Eco panel ── */
+    .eco-panel {
+      display:none; background:#f0faf0;
+      border:2px solid #4caf50; border-radius:12px;
+      padding:22px 24px; animation:slideDown .25s ease;
+    }
+    @keyframes slideDown { from{opacity:0;transform:translateY(-8px)} to{opacity:1;transform:translateY(0)} }
+    @keyframes fadeIn    { from{opacity:0} to{opacity:1} }
 
-        .shipment-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 8px 16px;
-        }
+    .eco-panel h3 { margin:0 0 4px; font-size:17px; color:#1b5e20; }
+    .eco-intro    { margin:0 0 18px; font-size:13px; color:#555; }
+    .eco-section-title {
+      font-size:11px; font-weight:800; letter-spacing:.6px;
+      text-transform:uppercase; color:#2e7d32; margin:0 0 10px;
+    }
+    .eco-divider { border:none; border-top:1px solid #c8e6c9; margin:16px 0; }
 
-        .badge {
-            display: inline-block;
-            padding: 6px 10px;
-            border-radius: 999px;
-            font-size: 12px;
-            font-weight: 700;
-            letter-spacing: .3px;
-            background: #ffe680;
-            color: #7a5a00;
-        }
+    .eco-panel-header {
+      display:flex; align-items:flex-start; justify-content:space-between;
+      gap:16px; flex-wrap:wrap; margin-bottom:18px;
+    }
+    .eco-panel-header>div:first-child { flex:1; min-width:0; }
+    .radius-control {
+      display:flex; flex-direction:column; align-items:flex-end;
+      gap:4px; flex-shrink:0; min-width:160px;
+    }
+    .radius-label { font-size:10px; font-weight:800; letter-spacing:.5px; text-transform:uppercase; color:#2e7d32; }
+    .radius-row   { display:flex; align-items:center; gap:8px; }
+    .radius-val   { font-size:13px; font-weight:900; color:#1b5e20; min-width:44px; text-align:right; }
+    #radius-slider {
+      -webkit-appearance:none; appearance:none; width:110px; height:4px;
+      border-radius:4px; outline:none; cursor:pointer;
+      background:linear-gradient(to right,#4caf50 0%,#4caf50 var(--pct,0%),#c8e6c9 var(--pct,0%),#c8e6c9 100%);
+    }
+    #radius-slider::-webkit-slider-thumb {
+      -webkit-appearance:none; width:16px; height:16px; border-radius:50%;
+      background:#2e7d32; border:2px solid #fff; box-shadow:0 1px 4px rgba(0,0,0,.25); cursor:pointer;
+    }
 
-        .row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 14px;
-        }
+    /* Loc list */
+    .loc-list { display:flex; flex-direction:column; gap:6px; }
+    .loc-row {
+      display:flex; align-items:center; gap:12px;
+      background:#fff; border:2px solid #c8e6c9;
+      border-radius:10px; padding:10px 14px; cursor:pointer; transition:all .16s ease;
+    }
+    .loc-row:hover    { border-color:#4caf50; background:#f4fbf4; }
+    .loc-row.selected { border-color:#2e7d32; background:#e8f5e9; box-shadow:0 0 0 3px rgba(46,125,50,.12); }
+    .loc-row.no-eco   { border-color:#e0e0e0; }
+    .loc-row.no-eco:hover    { border-color:#bbb; background:#fafafa; }
+    .loc-row.no-eco.selected { border-color:#999; background:#f5f5f5; box-shadow:0 0 0 3px rgba(0,0,0,.06); }
+    .loc-row.out-of-range    { display:none; }
+    .loc-row-icon  { font-size:22px; flex-shrink:0; width:32px; text-align:center; }
+    .loc-row-info  { flex:1; min-width:0; }
+    .loc-row-name  { font-size:13px; font-weight:700; color:#1a1a1a; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .loc-row-addr  { font-size:11px; color:#777; margin-top:1px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .loc-row-right { display:flex; flex-direction:column; align-items:flex-end; gap:4px; flex-shrink:0; }
+    .loc-type-badge{ font-size:9px; font-weight:700; letter-spacing:.3px; text-transform:uppercase; color:#999; border:1px solid #ddd; border-radius:4px; padding:1px 6px; }
+    .loc-pts-pill  { font-size:11px; font-weight:800; padding:2px 10px; border-radius:20px; }
+    .loc-pts-pill.green { background:#c8e6c9; color:#1b5e20; }
+    .loc-pts-pill.best  { background:#2e7d32; color:#fff; }
+    .loc-pts-pill.none  { background:#f0f0f0; color:#aaa; }
 
-        .field {
-            background: #fafafa;
-            border-radius: 8px;
-            padding: 12px 14px;
-        }
+    /* No-eco notice */
+    .no-eco-notice {
+      display:none; align-items:center; gap:10px;
+      background:#fff8e1; border:1px solid #ffe082;
+      border-radius:8px; padding:10px 14px; font-size:12px; color:#7a5a00;
+    }
+    .no-eco-notice.visible { display:flex; }
 
-        .field label {
-            font-size: 12px;
-            color: #666;
-            display: block;
-            margin-bottom: 6px;
-        }
+    /* Date options */
+    .date-options { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; transition:opacity .2s; }
+    .date-options.disabled { opacity:.35; pointer-events:none; }
+    .date-opt {
+      cursor:pointer; border:2px solid #c8e6c9; background:#fff;
+      border-radius:10px; padding:12px 8px 10px; text-align:center;
+      transition:all .18s ease; position:relative;
+    }
+    .date-opt:hover    { border-color:#4caf50; background:#f1f8f1; }
+    .date-opt.selected { border-color:#2e7d32; background:#e8f5e9; box-shadow:0 0 0 3px rgba(46,125,50,.15); }
+    .date-opt.best-combo { border-color:#ff8f00; background:#fff8e1; }
+    .date-opt.best-combo.selected { border-color:#ff8f00; background:#fff3cd; box-shadow:0 0 0 3px rgba(255,143,0,.2); }
+    .date-opt.best-combo .dopt-pts { background:#ff8f00; }
+    .dopt-day  { font-size:12px; font-weight:800; color:#1a1a1a; }
+    .dopt-date { font-size:10px; color:#666; margin:2px 0 4px; }
+    .dopt-delay{ font-size:10px; color:#888; margin-bottom:5px; }
+    .dopt-pts  { display:inline-block; background:#2e7d32; color:#fff; font-size:11px; font-weight:800; padding:3px 10px; border-radius:20px; }
+    .dopt-co2  { display:block; font-size:9px; color:#4caf50; margin-top:4px; font-weight:700; }
+    .best-tag  { position:absolute; top:-1px; right:-1px; background:#ff8f00; color:#fff; font-size:9px; font-weight:800; padding:2px 7px; border-radius:0 8px 0 8px; }
 
-        .field div {
-            font-size: 16px;
-            font-weight: 600;
-        }
+    /* Desglose */
+    .pts-breakdown {
+      display:none; background:#e8f5e9; border:1px solid #a5d6a7;
+      border-radius:8px; padding:12px 16px; font-size:12px; color:#1b5e20;
+      margin-top:-4px; animation:fadeIn .2s ease;
+    }
+    .pts-breakdown.visible { display:block; }
+    .bd-title { font-size:10px; font-weight:800; letter-spacing:.4px; text-transform:uppercase; color:#2e7d32; margin-bottom:8px; }
+    .pts-breakdown table { width:100%; border-collapse:collapse; }
+    .pts-breakdown td   { padding:3px 4px; }
+    .pts-breakdown td:last-child { text-align:right; font-weight:800; }
+    .pts-breakdown tr.bd-total td { border-top:1px solid #a5d6a7; font-weight:900; color:#2e7d32; padding-top:6px; }
 
-        .actions {
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
-            margin-top: 6px;
-        }
+    /* Live bar */
+    .pts-live-bar {
+      display:flex; align-items:center; justify-content:space-between;
+      background:#fff; border:1px solid #c8e6c9; border-radius:10px;
+      padding:12px 18px; gap:12px; flex-wrap:wrap; margin-top:8px;
+    }
+    .pts-live-breakdown { display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+    .pli { display:flex; flex-direction:column; gap:1px; }
+    .pli-label { font-size:9px; font-weight:800; color:#aaa; letter-spacing:.5px; text-transform:uppercase; }
+    .pli-val   { font-size:14px; font-weight:800; color:#555; transition:color .2s; }
+    .pli-val.active { color:#2e7d32; }
+    .pts-live-sep { color:#ccc; font-size:16px; }
+    .pts-live-total { display:flex; flex-direction:column; align-items:flex-end; }
+    .plt-label { font-size:9px; font-weight:800; color:#aaa; letter-spacing:.5px; text-transform:uppercase; }
+    .plt-val   { font-size:28px; font-weight:900; color:#bbb; line-height:1; transition:color .25s,transform .2s; }
+    .plt-val.has-value { color:#1b5e20; }
+    .plt-val.bump { transform:scale(1.14); }
 
-        .btn-outline {
-            background: transparent;
-            border: 2px solid #d40511;
-            color: #d40511;
-            padding: 10px 18px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all .2s ease;
-        }
+    /* CO2 chip */
+    .co2-chip {
+      display:none; align-items:center; gap:6px;
+      background:#e8f5e9; border:1px solid #a5d6a7;
+      border-radius:20px; padding:5px 14px; font-size:12px; font-weight:700; color:#1b5e20;
+      margin-top:8px;
+    }
+    .co2-chip.visible { display:flex; }
 
-        .btn-outline:hover {
-            background: #ffd6d8;
-        }
+    /* Confirm */
+    .btn-confirm-eco {
+      background:linear-gradient(135deg,#2e7d32,#4caf50);
+      color:#fff; border:none; padding:13px 26px; border-radius:8px;
+      font-size:14px; font-weight:700; cursor:pointer; transition:opacity .2s;
+      width:100%; margin-top:14px;
+    }
+    .btn-confirm-eco:disabled { opacity:.38; cursor:default; }
+    .btn-confirm-eco:not(:disabled):hover { opacity:.88; }
+    .eco-confirm-hint { text-align:center; font-size:12px; color:#888; margin:6px 0 0; }
+    .eco-confirm-hint.ready { color:#2e7d32; font-weight:600; }
 
-        .note {
-            font-size: 13px;
-            color: #444;
-            background: #fff9d6;
-            border: 1px solid #ffe58f;
-            padding: 10px 12px;
-            border-radius: 6px;
-        }
+    /* Activation msg */
+    .eco-activated-msg {
+      display:none; align-items:center; gap:12px;
+      background:#e8f5e9; border:1px solid #a5d6a7;
+      border-radius:8px; padding:14px 18px; font-size:14px;
+      color:#1b5e20; font-weight:600; flex-wrap:wrap; margin-top:14px;
+    }
+    .eco-activated-msg.visible { display:flex; }
+    .eco-activated-msg .pts-pill {
+      background:#2e7d32; color:#fff; border-radius:20px;
+      padding:4px 14px; font-size:15px; font-weight:800; white-space:nowrap; margin-left:auto;
+    }
 
+    /* Dashboard */
+    .dashboard-section {
+      background:#fff; border-radius:10px;
+      box-shadow:0 2px 10px rgba(0,0,0,.08);
+      padding:24px; margin-top:24px; display:none;
+      animation:fadeIn .4s ease;
+    }
+    .dashboard-section h2 { margin:0 0 4px; font-size:18px; }
+    .dash-subtitle { font-size:13px; color:#666; margin:0 0 18px; }
+    .dash-kpis { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:20px; }
+    .dash-kpi { background:#f4fbf4; border:1px solid #c8e6c9; border-radius:8px; padding:14px; }
+    .dash-kpi .kpi-l { font-size:10px; font-weight:800; color:#999; letter-spacing:.5px; text-transform:uppercase; }
+    .dash-kpi .kpi-v { font-size:24px; font-weight:900; color:#1b5e20; margin-top:3px; }
+    .dash-kpi .kpi-s { font-size:11px; color:#888; margin-top:1px; }
+    .pedidos-wrap { overflow:auto; max-height:300px; border-radius:8px; border:1px solid #e8e8e8; }
+    .pedidos-table { width:100%; border-collapse:collapse; font-size:12px; }
+    .pedidos-table thead th {
+      position:sticky; top:0; background:#1b5e20; color:#fff;
+      padding:8px 10px; text-align:left; font-size:11px; font-weight:800; letter-spacing:.3px;
+    }
+    .pedidos-table tbody tr { border-bottom:1px solid #f0f0f0; }
+    .pedidos-table tbody tr:hover { background:#f0faf0; }
+    .pedidos-table tbody td { padding:7px 10px; color:#333; }
+    .eco-badge { background:#e8f5e9; color:#1b5e20; border-radius:10px; padding:2px 8px; font-size:10px; font-weight:800; }
+    .std-badge { background:#fff3e0; color:#e65100; border-radius:10px; padding:2px 8px; font-size:10px; font-weight:800; }
 
-        /* ── Eco options panel ── */
-        .eco-panel {
-            display: none;
-            margin-top: 16px;
-            background: #f0faf0;
-            border: 2px solid #4caf50;
-            border-radius: 12px;
-            padding: 22px 24px;
-            animation: slideDown .25s ease;
-        }
-        @keyframes slideDown {
-            from { opacity:0; transform:translateY(-8px); }
-            to   { opacity:1; transform:translateY(0); }
-        }
-        .eco-panel h3 {
-            margin: 0 0 4px;
-            font-size: 17px;
-            color: #1b5e20;
-        }
-        .eco-panel p.eco-intro {
-            margin: 0 0 18px;
-            font-size: 13px;
-            color: #555;
-        }
-
-        /* ── Section headings inside panel ── */
-        .eco-section-title {
-            font-size: 11px;
-            font-weight: 800;
-            letter-spacing: .6px;
-            text-transform: uppercase;
-            color: #2e7d32;
-            margin: 0 0 10px;
-        }
-        .eco-divider {
-            border: none;
-            border-top: 1px solid #c8e6c9;
-            margin: 16px 0;
-        }
-
-        /* ── Location list picker ── */
-        .loc-list {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
-        .loc-row {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            background: #fff;
-            border: 2px solid #c8e6c9;
-            border-radius: 10px;
-            padding: 10px 14px;
-            cursor: pointer;
-            transition: all .16s ease;
-        }
-        .loc-row:hover { border-color: #4caf50; background: #f4fbf4; }
-        .loc-row.selected {
-            border-color: #2e7d32;
-            background: #e8f5e9;
-            box-shadow: 0 0 0 3px rgba(46,125,50,.12);
-        }
-        .loc-row.no-eco {
-            border-color: #e0e0e0;
-        }
-        .loc-row.no-eco:hover { border-color: #bbb; background: #fafafa; }
-        .loc-row.no-eco.selected {
-            border-color: #999;
-            background: #f5f5f5;
-            box-shadow: 0 0 0 3px rgba(0,0,0,.06);
-        }
-        .loc-row-icon {
-            font-size: 22px;
-            flex-shrink: 0;
-            width: 32px;
-            text-align: center;
-        }
-        .loc-row-info { flex: 1; min-width: 0; }
-        .loc-row-name {
-            font-size: 13px;
-            font-weight: 700;
-            color: #1a1a1a;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        .loc-row-addr {
-            font-size: 11px;
-            color: #777;
-            margin-top: 1px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        .loc-row-right {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-end;
-            gap: 4px;
-            flex-shrink: 0;
-        }
-        .loc-type-badge {
-            font-size: 9px;
-            font-weight: 700;
-            letter-spacing: .3px;
-            text-transform: uppercase;
-            color: #999;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            padding: 1px 6px;
-        }
-        .loc-pts-pill {
-            font-size: 11px;
-            font-weight: 800;
-            padding: 2px 10px;
-            border-radius: 20px;
-            background: #e0e0e0;
-            color: #666;
-        }
-        .loc-pts-pill.green { background: #c8e6c9; color: #1b5e20; }
-        .loc-pts-pill.best  { background: #2e7d32; color: #fff; }
-        .loc-pts-pill.none  { background: #f0f0f0; color: #aaa; }
-
-        /* ── No-eco notice ── */
-        .no-eco-notice {
-            display: none;
-            align-items: center;
-            gap: 10px;
-            background: #fff8e1;
-            border: 1px solid #ffe082;
-            border-radius: 8px;
-            padding: 10px 14px;
-            font-size: 12px;
-            color: #7a5a00;
-            margin-bottom: 0;
-        }
-        .no-eco-notice.visible { display: flex; }
-
-        /* ── Date options (greyed when no-eco location) ── */
-        .date-options {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
-            transition: opacity .2s;
-        }
-        .date-options.disabled {
-            opacity: .35;
-            pointer-events: none;
-        }
-        .date-opt {
-            cursor: pointer;
-            border: 2px solid #c8e6c9;
-            background: #fff;
-            border-radius: 10px;
-            padding: 12px 8px 10px;
-            text-align: center;
-            transition: all .18s ease;
-            position: relative;
-        }
-        .date-opt:hover { border-color: #4caf50; background: #f1f8f1; }
-        .date-opt.selected {
-            border-color: #2e7d32;
-            background: #e8f5e9;
-            box-shadow: 0 0 0 3px rgba(46,125,50,.15);
-        }
-        .date-opt .dopt-day   { font-size: 12px; font-weight: 800; color: #1a1a1a; }
-        .date-opt .dopt-date  { font-size: 10px; color: #666; margin: 2px 0 6px; }
-        .date-opt .dopt-delay { font-size: 10px; color: #888; margin-bottom: 8px; }
-        .date-opt .dopt-pts {
-            display: inline-block;
-            background: #2e7d32;
-            color: #fff;
-            font-size: 11px;
-            font-weight: 800;
-            padding: 3px 10px;
-            border-radius: 20px;
-            transition: background .2s;
-        }
-        /* Best combination highlight */
-        .date-opt.best-combo {
-            border-color: #ff8f00;
-            background: #fff8e1;
-        }
-        .date-opt.best-combo.selected {
-            border-color: #ff8f00;
-            background: #fff3cd;
-            box-shadow: 0 0 0 3px rgba(255,143,0,.2);
-        }
-        .date-opt.best-combo .dopt-pts { background: #ff8f00; }
-        .best-tag {
-            position: absolute;
-            top: -1px; right: -1px;
-            background: #ff8f00;
-            color: #fff;
-            font-size: 9px;
-            font-weight: 800;
-            padding: 2px 7px;
-            border-radius: 0 8px 0 8px;
-            letter-spacing: .3px;
-        }
-
-        /* ── Live EcoPoints bar ── */
-        .pts-live-bar {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: #fff;
-            border: 1px solid #c8e6c9;
-            border-radius: 10px;
-            padding: 12px 18px;
-            gap: 12px;
-            flex-wrap: wrap;
-        }
-        .pts-live-breakdown {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            align-items: center;
-        }
-        .pli {
-            display: flex;
-            flex-direction: column;
-            gap: 1px;
-        }
-        .pli-label {
-            font-size: 9px;
-            font-weight: 800;
-            color: #aaa;
-            letter-spacing: .5px;
-            text-transform: uppercase;
-        }
-        .pli-val {
-            font-size: 14px;
-            font-weight: 800;
-            color: #555;
-            transition: color .2s;
-        }
-        .pli-val.active { color: #2e7d32; }
-        .pts-live-sep { color: #ccc; font-size: 16px; }
-        .pts-live-total {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-end;
-        }
-        .plt-label {
-            font-size: 9px;
-            font-weight: 800;
-            color: #aaa;
-            letter-spacing: .5px;
-            text-transform: uppercase;
-        }
-        .plt-val {
-            font-size: 28px;
-            font-weight: 900;
-            color: #bbb;
-            line-height: 1;
-            transition: color .25s, transform .2s;
-        }
-        .plt-val.has-value { color: #1b5e20; }
-        .plt-val.bump { transform: scale(1.14); }
-
-        /* ── Confirm button ── */
-        .btn-confirm-eco {
-            background: linear-gradient(135deg, #2e7d32, #4caf50);
-            color: #fff;
-            border: none;
-            padding: 13px 26px;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: opacity .2s;
-            width: 100%;
-            margin-top: 14px;
-        }
-        .btn-confirm-eco:disabled { opacity: .38; cursor: default; }
-        .btn-confirm-eco:not(:disabled):hover { opacity: .88; }
-
-        /* ── Confirm hint ── */
-        .eco-confirm-hint {
-            text-align: center;
-            font-size: 12px;
-            color: #888;
-            margin: 6px 0 0;
-        }
-        .eco-confirm-hint.ready { color: #2e7d32; font-weight: 600; }
-
-        /* ── Activated message ── */
-        .eco-activated-msg {
-            display: none;
-            align-items: center;
-            gap: 12px;
-            background: #e8f5e9;
-            border: 1px solid #a5d6a7;
-            border-radius: 8px;
-            padding: 14px 18px;
-            font-size: 14px;
-            color: #1b5e20;
-            font-weight: 600;
-            flex-wrap: wrap;
-            margin-top: 14px;
-        }
-        .eco-activated-msg.visible { display: flex; }
-        .eco-activated-msg .pts-pill {
-            background: #2e7d32;
-            color: #fff;
-            border-radius: 20px;
-            padding: 4px 14px;
-            font-size: 15px;
-            font-weight: 800;
-            white-space: nowrap;
-            margin-left: auto;
-        }
-
-        /* ── Panel header row (title + radius slider) ── */
-        .eco-panel-header {
-            display: flex;
-            align-items: flex-start;
-            justify-content: space-between;
-            gap: 16px;
-            flex-wrap: wrap;
-            margin-bottom: 18px;
-        }
-        .eco-panel-header > div:first-child { flex: 1; min-width: 0; }
-        .radius-control {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-end;
-            gap: 4px;
-            flex-shrink: 0;
-            min-width: 160px;
-        }
-        .radius-label {
-            font-size: 10px;
-            font-weight: 800;
-            letter-spacing: .5px;
-            text-transform: uppercase;
-            color: #2e7d32;
-            white-space: nowrap;
-        }
-        .radius-row {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .radius-val {
-            font-size: 13px;
-            font-weight: 900;
-            color: #1b5e20;
-            min-width: 44px;
-            text-align: right;
-            white-space: nowrap;
-        }
-        #radius-slider {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 110px;
-            height: 4px;
-            border-radius: 4px;
-            background: linear-gradient(to right, #4caf50 0%, #4caf50 var(--pct, 0%), #c8e6c9 var(--pct, 0%), #c8e6c9 100%);
-            outline: none;
-            cursor: pointer;
-        }
-        #radius-slider::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            width: 16px;
-            height: 16px;
-            border-radius: 50%;
-            background: #2e7d32;
-            border: 2px solid #fff;
-            box-shadow: 0 1px 4px rgba(0,0,0,.25);
-            cursor: pointer;
-        }
-        #radius-slider::-moz-range-thumb {
-            width: 16px;
-            height: 16px;
-            border-radius: 50%;
-            background: #2e7d32;
-            border: 2px solid #fff;
-            box-shadow: 0 1px 4px rgba(0,0,0,.25);
-            cursor: pointer;
-        }
-        /* Hidden location rows (outside radius) */
-        .loc-row.out-of-range {
-            display: none;
-        }
-    </style>
+    @media(max-width:720px){
+      .row,.date-options,.dash-kpis{ grid-template-columns:1fr; }
+      .dash-kpis { grid-template-columns:1fr 1fr; }
+    }
+  </style>
 </head>
-
 <body>
 
-    <header>
-        <div><a href="index.html" style="text-decoration:none;"><strong class="logo">HackatonDHL</strong></a></div>
-        <nav>
-            <a href="index.html">Haga seguimiento</a>
-            <a href="#">Enviar</a>
-            <a href="#">Servicios de logística</a>
-            <a href="#">Servicio al cliente</a>
-        </nav>
-        <a href="profile.html" class="header-profile">
-            <span class="header-avatar">CM</span>
-            <span class="header-username">Carlos M.</span>
-        </a>
-    </header>
+  <header>
+    <div><a href="index.html" style="text-decoration:none;"><strong class="logo">HackatonDHL</strong></a></div>
+    <nav>
+      <a href="index.html">Haga seguimiento</a>
+      <a href="#">Enviar</a>
+      <a href="#">Servicios de logística</a>
+      <a href="#">Servicio al cliente</a>
+    </nav>
+    <a href="profile.html" class="header-profile">
+      <span class="header-avatar">CM</span>
+      <span class="header-username">Carlos M.</span>
+    </a>
+  </header>
 
-    <main class="container">
-        <h1 style="margin: 10px 0 18px;">Detalle del envío</h1>
-        <h2 style="margin-top:40px;">Ubicación del envío</h2>
-        <div id="map"></div>
+  <main class="container">
+    <h1 style="margin:10px 0 18px;">Detalle del envío</h1>
+    <h2 style="margin-top:40px;">Ubicación del envío</h2>
+    <div id="map"></div>
 
-        <section class="shipment-card" id="card">
-            <div class="shipment-header">
-                <div>
-                    <div style="font-size:18px; font-weight:800;">Envío #1234 5678 90</div>
-                    <span class="badge" id="badge-servicio">Servicio: Estándar</span>
-                </div>
-                <div class="actions">
-                    <button class="btn-outline" id="btn-eco">🍃 Cambiar a EnvíoEco</button>
-                    <a class="btn" href="index.html">Volver</a>
-                </div>
-            </div>
+    <!-- Banner resultados del algoritmo (visible siempre) -->
+    <div class="algo-banner visible" id="algo-banner">
+      <div class="algo-banner-label">🤖 Resultados del algoritmo de optimización · zona 28931 · ejecutado offline</div>
+      <div class="algo-stats-row">
+        <div class="algo-stat">
+          <span class="as-l">Pedidos analizados</span>
+          <span class="as-v">500</span>
+          <span class="as-s">14 días simulados</span>
+        </div>
+        <div class="algo-stat">
+          <span class="as-l">Rutas evaluadas</span>
+          <span class="as-v">84</span>
+          <span class="as-s">domicilio + 5 puntos eco</span>
+        </div>
+        <div class="algo-stat">
+          <span class="as-l">CO₂ evitable total</span>
+          <span class="as-v">1.582 kg</span>
+          <span class="as-s">si todos activan EnvíoEco</span>
+        </div>
+        <div class="algo-stat">
+          <span class="as-l">Ahorro logístico</span>
+          <span class="as-v">6.412 €</span>
+          <span class="as-s">rutas consolidadas</span>
+        </div>
+      </div>
+    </div>
 
-            <!-- ECO OPTIONS PANEL (hidden until button click) -->
-            <div class="eco-panel" id="eco-panel">
+    <section class="shipment-card" id="card" style="margin-top:16px;">
+      <div class="shipment-header">
+        <div>
+          <div style="font-size:18px;font-weight:800;">Envío #1234 5678 90</div>
+          <span class="badge" id="badge-servicio">Servicio: Estándar</span>
+        </div>
+        <div class="actions">
+          <button class="btn-outline" id="btn-eco">🍃 Cambiar a EnvíoEco</button>
+          <a class="btn" href="index.html">Volver</a>
+        </div>
+      </div>
 
-                <!-- Panel header: title + radius slider -->
-                <div class="eco-panel-header">
-                    <div>
-                        <h3>🌿 Configura tu EnvíoEco</h3>
-                        <p class="eco-intro" style="margin-bottom:0">Elige ubicación y fecha — los puntos se calculan instantáneamente con cada combinación.</p>
-                    </div>
-                    <div class="radius-control">
-                        <span class="radius-label">📍 Radio de búsqueda</span>
-                        <div class="radius-row">
-                            <input type="range" id="radius-slider" min="1" max="10" value="3" step="0.5"
-                                oninput="onRadiusChange(this)">
-                            <span class="radius-val" id="radius-val">3 km</span>
-                        </div>
-                    </div>
-                </div>
+      <!-- ECO PANEL -->
+      <div class="eco-panel" id="eco-panel">
 
-                <!-- LOCATION ROW -->
-                <p class="eco-section-title">📍 Selecciona un punto de recogida</p>
-                <div class="loc-list" id="loc-list">
-
-                    <div class="loc-row no-eco" data-loc-bonus="0" data-eco="false" data-dist="0" data-loc-label="Tu casa (C/ Portillo, 42)" onclick="selectLocation(this)">
-                        <div class="loc-row-icon">🏠</div>
-                        <div class="loc-row-info">
-                            <div class="loc-row-name">Tu casa</div>
-                            <div class="loc-row-addr">C/ Portillo, 42 – Piso 3º B</div>
-                        </div>
-                        <div class="loc-row-right">
-                            <span class="loc-type-badge">Domicilio</span>
-                            <span class="loc-pts-pill none">Sin EcoPoints</span>
-                        </div>
-                    </div>
-
-                    <div class="loc-row" data-loc-bonus="60" data-eco="true" data-dist="0.8" data-loc-label="Correos – C/ Leganés, 3" onclick="selectLocation(this)">
-                        <div class="loc-row-icon">📨</div>
-                        <div class="loc-row-info">
-                            <div class="loc-row-name">Correos</div>
-                            <div class="loc-row-addr">C/ Leganés, 3</div>
-                        </div>
-                        <div class="loc-row-right">
-                            <span class="loc-type-badge">Oficina postal</span>
-                            <span class="loc-pts-pill green">hasta +400 pts</span>
-                        </div>
-                    </div>
-
-                    <div class="loc-row" data-loc-bonus="60" data-eco="true" data-dist="1.5" data-loc-label="Lotterías – C/ Murcia, 17" onclick="selectLocation(this)">
-                        <div class="loc-row-icon">🎫</div>
-                        <div class="loc-row-info">
-                            <div class="loc-row-name">Lotterías y apuestas</div>
-                            <div class="loc-row-addr">C/ Murcia, 17</div>
-                        </div>
-                        <div class="loc-row-right">
-                            <span class="loc-type-badge">Estanquillo</span>
-                            <span class="loc-pts-pill green">hasta +400 pts</span>
-                        </div>
-                    </div>
-
-                    <div class="loc-row" data-loc-bonus="80" data-eco="true" data-dist="2.3" data-loc-label="Supermercado Día – C/ Real, 8" onclick="selectLocation(this)">
-                        <div class="loc-row-icon">🛒</div>
-                        <div class="loc-row-info">
-                            <div class="loc-row-name">Supermercado Día</div>
-                            <div class="loc-row-addr">C/ Real, 8</div>
-                        </div>
-                        <div class="loc-row-right">
-                            <span class="loc-type-badge">Supermercado</span>
-                            <span class="loc-pts-pill green">hasta +420 pts</span>
-                        </div>
-                    </div>
-
-                    <div class="loc-row" data-loc-bonus="80" data-eco="true" data-dist="3.7" data-loc-label="Farmacia Central – Av. Constitución, 5" onclick="selectLocation(this)">
-                        <div class="loc-row-icon">💊</div>
-                        <div class="loc-row-info">
-                            <div class="loc-row-name">Farmacia Central</div>
-                            <div class="loc-row-addr">Av. Constitución, 5</div>
-                        </div>
-                        <div class="loc-row-right">
-                            <span class="loc-type-badge">Farmacia</span>
-                            <span class="loc-pts-pill green">hasta +420 pts</span>
-                        </div>
-                    </div>
-
-                    <div class="loc-row" data-loc-bonus="120" data-eco="true" data-dist="5.2" data-loc-label="Casillero DHL – Estación Atocha" onclick="selectLocation(this)">
-                        <div class="loc-row-icon">📦</div>
-                        <div class="loc-row-info">
-                            <div class="loc-row-name">Casillero DHL</div>
-                            <div class="loc-row-addr">Estación Atocha – Planta baja</div>
-                        </div>
-                        <div class="loc-row-right">
-                            <span class="loc-type-badge">Casillero 24 h</span>
-                            <span class="loc-pts-pill best">⭐ hasta +460 pts</span>
-                        </div>
-                    </div>
-
-                </div>
-
-                <hr class="eco-divider">
-
-                <!-- DATE ROW -->
-                <p class="eco-section-title">📅 ¿Cuándo puedes recibirlo?</p>
-                <!-- No-eco notice (shown when home is selected) -->
-                <div class="no-eco-notice" id="no-eco-notice">
-                    <span style="font-size:18px">⚠️</span>
-                    <span>La entrega a <strong>domicilio</strong> no genera EcoPoints: no permite agrupar paquetes. Elige otro punto de recogida para ganar puntos.</span>
-                </div>
-                <div class="date-options" id="date-options">
-                    <!-- built by JS -->
-                </div>
-
-                <hr class="eco-divider">
-
-                <!-- LIVE ECOPOINTS BAR -->
-                <div class="pts-live-bar">
-                    <div class="pts-live-breakdown">
-                        <div class="pli">
-                            <span class="pli-label">Por ubicación</span>
-                            <span class="pli-val" id="pli-loc">—</span>
-                        </div>
-                        <span class="pts-live-sep">+</span>
-                        <div class="pli">
-                            <span class="pli-label">Por fecha</span>
-                            <span class="pli-val" id="pli-date">—</span>
-                        </div>
-                        <span class="pts-live-sep">=</span>
-                    </div>
-                    <div class="pts-live-total">
-                        <span class="plt-label">Total EcoPoints</span>
-                        <span class="plt-val" id="plt-val">—</span>
-                    </div>
-                </div>
-
-                <button class="btn-confirm-eco" id="btn-confirm" disabled onclick="confirmEco()">Confirmar EnvíoEco</button>
-                <p class="eco-confirm-hint" id="eco-confirm-hint">Selecciona una ubicación y una fecha para continuar</p>
-
-                <!-- Post-confirmation message -->
-                <div class="eco-activated-msg" id="eco-activated">
-                    <div>
-                        <div>✅ EnvíoEco activado</div>
-                        <div style="font-size:13px;font-weight:400;margin-top:3px;">Entrega el <strong id="activated-date">—</strong> · <span id="activated-loc-label">—</span></div>
-                    </div>
-                    <span class="pts-pill" id="activated-pts">—</span>
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="field">
-                    <label>Estado</label>
-                    <div id="estado">En tránsito</div>
-                </div>
-                <div class="field">
-                    <label>Entrega estimada</label>
-                    <div>Martes 25 de febrero, 12:00–16:00</div>
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="field">
-                    <label>Origen</label>
-                    <div>Madrid, ES</div>
-                </div>
-                <div class="field">
-                    <label>Destino</label>
-                    <div>Barcelona, ES</div>
-                </div>
-            </div>
-
-            <p class="note" id="nota">
-                Este envío usa el servicio Estándar. Puedes cambiar a <strong>EnvíoEco</strong> para reducir tu huella
-                de carbono.
+        <div class="eco-panel-header">
+          <div>
+            <h3>🌿 Configura tu EnvíoEco</h3>
+            <p class="eco-intro">
+              Puntos calculados por el optimizador sobre <strong>84 rutas futuras</strong>
+              de la zona 28931. Los valores provienen directamente de la salida del algoritmo.
             </p>
-        </section>
-        <section class="impact-section" aria-labelledby="impact-title">
-            <h2 id="impact-title">Impacto ambiental del envío</h2>
-
-            <div class="impact-summary">
-                <div class="impact-item">
-                    <span class="label">Emisiones estimadas</span>
-                    <span class="value"><span id="co2-value">4.8</span> kg CO₂e</span>
-                </div>
-                <div class="impact-item">
-                    <span class="label">Ahorro con EnvíoEco</span>
-                    <span class="value saving">hasta <span id="saving-percent">40</span>%</span>
-                </div>
+          </div>
+          <div class="radius-control">
+            <span class="radius-label">📍 Radio de búsqueda</span>
+            <div class="radius-row">
+              <input type="range" id="radius-slider" min="1" max="10" value="3" step="0.5"
+                     oninput="onRadiusChange(this)">
+              <span class="radius-val" id="radius-val">3 km</span>
             </div>
+          </div>
+        </div>
 
-            <!-- Barra de progreso accesible -->
-            <div class="impact-bar" role="progressbar" aria-valuemin="0" aria-valuemax="10" aria-valuenow="4.8"
-                aria-label="Emisiones de CO2 del envío">
-                <div class="impact-bar__fill" id="impact-fill" style="width: 48%"></div>
+        <p class="eco-section-title">📍 Selecciona un punto de recogida</p>
+        <div class="loc-list" id="loc-list">
+          <!-- Domicilio -->
+          <div class="loc-row no-eco" data-eco="false" data-dist="0"
+               data-loc-label="Tu casa (C/ Portillo, 42)" onclick="selectLoc(this)">
+            <div class="loc-row-icon">🏠</div>
+            <div class="loc-row-info">
+              <div class="loc-row-name">Tu casa</div>
+              <div class="loc-row-addr">C/ Portillo, 42 – Piso 3º B</div>
             </div>
+            <div class="loc-row-right">
+              <span class="loc-type-badge">Domicilio</span>
+              <span class="loc-pts-pill none">Sin EcoPoints</span>
+            </div>
+          </div>
+          <!-- Puntos del algoritmo -->
+          <div id="loc-rows-algo"></div>
+        </div>
 
-            <p class="impact-note" id="impact-note">
-                Este envío usa el servicio <strong>Estándar</strong>. Cambia a <strong>EnvíoEco</strong> para reducir
-                las emisiones de CO₂e.
-            </p>
-        </section>
-    </main>
+        <hr class="eco-divider">
 
-    <script>
-        // ── Panel toggle ─────────────────────────────────────────────
-        const btnEcoBtn = document.getElementById('btn-eco');
-        const ecoPanel  = document.getElementById('eco-panel');
-        btnEcoBtn.addEventListener('click', () => {
-            if (btnEcoBtn.disabled) return;
-            const isOpen = ecoPanel.style.display === 'block';
-            ecoPanel.style.display = isOpen ? 'none' : 'block';
-        });
+        <p class="eco-section-title">📅 ¿Cuándo puedes recibirlo?</p>
+        <div class="no-eco-notice" id="no-eco-notice">
+          <span style="font-size:18px">⚠️</span>
+          <span>La entrega a <strong>domicilio</strong> no genera EcoPoints. Elige un punto de recogida.</span>
+        </div>
+        <div class="date-options" id="date-options"></div>
 
-        // ── State ─────────────────────────────────────────────────
-        let selectedLocBonus = null;
-        let selectedLocLabel = null;
-        let selectedLocEco   = null; // false = home delivery, no date pts
-        let selectedDays     = null;
-        let selectedDatePts  = null;
+        <hr class="eco-divider">
 
-        const baseDelivery = new Date(2026, 1, 25); // Tue 25 Feb 2026
+        <!-- Desglose del algoritmo -->
+        <div class="pts-breakdown" id="pts-breakdown">
+          <div class="bd-title">📊 Desglose calculado por OptimizadorEcoPuntosFinal.java</div>
+          <table>
+            <tr><td>⛽ Ahorro bruto en gasolina/ruta</td>             <td id="bd-gasolina">—</td></tr>
+            <tr><td>📦 Coste de almacenaje (<span id="bd-dias-label">0</span> días × 0.15€)</td><td id="bd-almacenaje">—</td></tr>
+            <tr><td>✅ Ahorro neto = bruto − almacenaje</td>          <td id="bd-neto">—</td></tr>
+            <tr><td>🤝 Fórmula: round(ahorroNeto × 50%) ÷ 0.10€/pt</td><td id="bd-formula">—</td></tr>
+            <tr class="bd-total"><td>Total EcoPoints (mín. 5)</td>    <td id="bd-total">—</td></tr>
+          </table>
+        </div>
 
-        const DATE_SLOTS = [
-            { days: 2, pts: 80  },
-            { days: 3, pts: 120 },
-            { days: 5, pts: 200 },
-            { days: 7, pts: 340 },
-        ];
-        const DAYS_ES   = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
-        const MONTHS_ES = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+        <!-- Barra live -->
+        <div class="pts-live-bar">
+          <div class="pts-live-breakdown">
+            <div class="pli">
+              <span class="pli-label">Por ubicación</span>
+              <span class="pli-val" id="pli-loc">—</span>
+            </div>
+            <span class="pts-live-sep">+</span>
+            <div class="pli">
+              <span class="pli-label">Por fecha</span>
+              <span class="pli-val" id="pli-date">—</span>
+            </div>
+            <span class="pts-live-sep">=</span>
+          </div>
+          <div class="pts-live-total">
+            <span class="plt-label">Total EcoPoints</span>
+            <span class="plt-val" id="plt-val">—</span>
+          </div>
+        </div>
 
-        function fmtLong(d) {
-            const s = d.toLocaleDateString('es-ES', { weekday:'long', day:'numeric', month:'long' });
-            return s.charAt(0).toUpperCase() + s.slice(1);
-        }
+        <!-- CO2 chip -->
+        <div class="co2-chip" id="co2-chip">
+          <span>🌿</span><span id="co2-chip-text">—</span>
+        </div>
 
-        // ── Build date cards on load ──────────────────────────────
-        function buildDateCards() {
-            const container  = document.getElementById('date-options');
-            const noEco      = selectedLocEco === false;
-            const locBonus   = (!noEco && selectedLocBonus !== null) ? selectedLocBonus : 0;
-            const maxTotal   = Math.max(...DATE_SLOTS.map(s => s.pts + locBonus));
+        <button class="btn-confirm-eco" id="btn-confirm" disabled onclick="confirmEco()">
+          Confirmar EnvíoEco
+        </button>
+        <p class="eco-confirm-hint" id="eco-confirm-hint">Selecciona una ubicación y una fecha para continuar</p>
 
-            container.innerHTML = '';
-            container.classList.toggle('disabled', noEco);
+        <div class="eco-activated-msg" id="eco-activated">
+          <div>
+            <div>✅ EnvíoEco activado</div>
+            <div style="font-size:13px;font-weight:400;margin-top:3px;">
+              Entrega el <strong id="activated-date">—</strong> · <span id="activated-loc-label">—</span>
+            </div>
+          </div>
+          <span class="pts-pill" id="activated-pts">—</span>
+        </div>
+      </div>
 
-            DATE_SLOTS.forEach(slot => {
-                const d     = new Date(baseDelivery);
-                d.setDate(d.getDate() + slot.days);
-                const total      = noEco ? 0 : slot.pts + locBonus;
-                const isBest     = !noEco && (total === maxTotal);
-                const wasSelected = (selectedDays === slot.days);
+      <div class="row">
+        <div class="field"><label>Estado</label>          <div id="estado">En tránsito</div></div>
+        <div class="field"><label>Entrega estimada</label><div>Martes 25 de febrero, 12:00–16:00</div></div>
+      </div>
+      <div class="row">
+        <div class="field"><label>Origen</label>  <div>Madrid, ES</div></div>
+        <div class="field"><label>Destino</label> <div>Barcelona, ES</div></div>
+      </div>
+      <p class="note" id="nota">
+        Este envío usa el servicio Estándar. Puedes cambiar a <strong>EnvíoEco</strong> para reducir tu huella de carbono.
+      </p>
+    </section>
 
-                const div = document.createElement('div');
-                div.className = 'date-opt' + (isBest ? ' best-combo' : '') + (wasSelected && !noEco ? ' selected' : '');
-                div.dataset.days    = slot.days;
-                div.dataset.datePts = noEco ? 0 : slot.pts;
-                div.innerHTML = (isBest ? '<span class="best-tag">⭐ Máximo</span>' : '') + `
-                    <div class="dopt-day">${DAYS_ES[d.getDay()]}</div>
-                    <div class="dopt-date">${d.getDate()} ${MONTHS_ES[d.getMonth()]}</div>
-                    <div class="dopt-delay">retraso +${slot.days} días</div>
-                    <span class="dopt-pts" style="${noEco ? 'background:#ccc;color:#888' : ''}">${noEco ? '0 pts' : '+' + total + ' pts'}</span>
-                `;
-                if (!noEco) div.addEventListener('click', () => selectDate(div));
-                container.appendChild(div);
-            });
-        }
+    <!-- Impacto ambiental -->
+    <section class="impact-section" aria-labelledby="impact-title">
+      <h2 id="impact-title">Impacto ambiental del envío</h2>
+      <div class="impact-summary">
+        <div class="impact-item">
+          <span class="label">Emisiones estimadas</span>
+          <span class="value"><span id="co2-value">4.8</span> kg CO₂e</span>
+        </div>
+        <div class="impact-item">
+          <span class="label">Ahorro con EnvíoEco</span>
+          <span class="value saving">hasta <span id="saving-percent">40</span>%</span>
+        </div>
+      </div>
+      <div class="impact-bar" role="progressbar" aria-valuemin="0" aria-valuemax="10"
+           aria-valuenow="4.8" aria-label="Emisiones CO2">
+        <div class="impact-bar__fill" id="impact-fill" style="width:48%"></div>
+      </div>
+      <p class="impact-note" id="impact-note">
+        Este envío usa el servicio <strong>Estándar</strong>. Cambia a <strong>EnvíoEco</strong> para reducir las emisiones de CO₂e.
+      </p>
+    </section>
 
-        // initial build (no location selected yet)
-        buildDateCards();
+    <!-- Dashboard resultados algoritmo -->
+    <section class="dashboard-section" id="dashboard-section">
+      <h2>📊 Resultados del algoritmo – Dataset completo</h2>
+      <p class="dash-subtitle">
+        Salida del optimizador Java ejecutado sobre <strong>500 pedidos simulados</strong>
+        en la zona postal <strong>28931 (Móstoles)</strong> · 14 días de horizonte de planificación.
+      </p>
+      <div class="dash-kpis">
+        <div class="dash-kpi">
+          <div class="kpi-l">Total pedidos</div>
+          <div class="kpi-v">500</div>
+          <div class="kpi-s">zona 28931 · 14 días</div>
+        </div>
+        <div class="dash-kpi">
+          <div class="kpi-l">Con EnvíoEco activo</div>
+          <div class="kpi-v">167</div>
+          <div class="kpi-s">33% del total (simulado)</div>
+        </div>
+        <div class="dash-kpi">
+          <div class="kpi-l">CO₂ evitado</div>
+          <div class="kpi-v">1.582 kg</div>
+          <div class="kpi-s">vs entrega estándar</div>
+        </div>
+        <div class="dash-kpi">
+          <div class="kpi-l">Ahorro logístico</div>
+          <div class="kpi-v">6.412 €</div>
+          <div class="kpi-s">rutas consolidadas</div>
+        </div>
+      </div>
+      <div class="pedidos-wrap">
+        <table class="pedidos-table">
+          <thead>
+            <tr>
+              <th>#</th><th>ID Envío</th><th>Destinatario</th>
+              <th>Entrega</th><th>Peso</th><th>CO₂ base</th><th>Estado</th>
+            </tr>
+          </thead>
+          <tbody id="pedidos-tbody"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
 
-        // ── Radius slider ─────────────────────────────────────────
-        function onRadiusChange(slider) {
-            const km  = parseFloat(slider.value);
-            const pct = ((km - 1) / (10 - 1)) * 100;
-            slider.style.setProperty('--pct', pct + '%');
-            document.getElementById('radius-val').textContent = km % 1 === 0 ? km + ' km' : km.toFixed(1) + ' km';
-            filterByRadius(km);
-        }
+  <script>
+    const R = ECO_RESULTADOS;
 
-        function filterByRadius(km) {
-            document.querySelectorAll('.loc-row').forEach(row => {
-                const dist = parseFloat(row.dataset.dist);
-                // Tu casa (dist=0) always visible
-                const inRange = dist === 0 || dist <= km;
-                row.classList.toggle('out-of-range', !inRange);
-                // If the selected row goes out of range, deselect it
-                if (!inRange && row.classList.contains('selected')) {
-                    row.classList.remove('selected');
-                    selectedLocBonus = null;
-                    selectedLocLabel = null;
-                    selectedLocEco   = null;
-                    selectedDays     = null;
-                    selectedDatePts  = null;
-                    document.getElementById('pli-loc').textContent = '—';
-                    document.getElementById('pli-loc').classList.remove('active');
-                    document.getElementById('pli-date').textContent = '—';
-                    document.getElementById('pli-date').classList.remove('active');
-                    document.getElementById('no-eco-notice').classList.remove('visible');
-                    buildDateCards();
-                    updateLiveTotal();
-                }
-            });
-        }
+    // ── Construir filas de ubicación desde maximosPorUbicacion ──
+    (function () {
+      const container = document.getElementById('loc-rows-algo');
+      const maxGlobal = Math.max(...R.maximosPorUbicacion.map(p => p.maxPts));
 
-        // Apply initial radius on load
-        (function() {
-            const slider = document.getElementById('radius-slider');
-            const initKm = parseFloat(slider.value);
-            const pct    = ((initKm - 1) / (10 - 1)) * 100;
-            slider.style.setProperty('--pct', pct + '%');
-            filterByRadius(initKm);
-        })();
+      R.maximosPorUbicacion.forEach(p => {
+        const isBest = p.maxPts === maxGlobal;
+        const pill = isBest
+          ? `<span class="loc-pts-pill best">⭐ hasta +${p.maxPts} pts</span>`
+          : `<span class="loc-pts-pill green">hasta +${p.maxPts} pts</span>`;
 
-        // ── Set max-pts labels on location rows ───────────────────
-        const MAX_DATE_PTS = Math.max(...DATE_SLOTS.map(s => s.pts));
-        document.querySelectorAll('.loc-row[data-eco="true"]').forEach(row => {
-            const bonus = parseInt(row.dataset.locBonus);
-            const pill  = row.querySelector('.loc-pts-pill');
-            if (pill) {
-                const isBest = bonus === Math.max(...[
-                    ...document.querySelectorAll('.loc-row[data-eco="true"]')
-                ].map(r => parseInt(r.dataset.locBonus)));
-                pill.textContent = (isBest ? '⭐ ' : '') + 'hasta +' + (bonus + MAX_DATE_PTS) + ' pts';
-            }
-        });
+        const row = document.createElement('div');
+        row.className = 'loc-row';
+        row.dataset.eco      = 'true';
+        row.dataset.dist     = p.dist;
+        row.dataset.nombre   = p.nombre;
+        row.dataset.locLabel = p.nombre;
+        row.innerHTML = `
+          <div class="loc-row-icon">${p.icono}</div>
+          <div class="loc-row-info">
+            <div class="loc-row-name">${p.nombre}</div>
+            <div class="loc-row-addr">${p.tipo} · ${p.dist} km de tu casa</div>
+          </div>
+          <div class="loc-row-right">
+            <span class="loc-type-badge">${p.tipo}</span>
+            ${pill}
+          </div>`;
+        row.addEventListener('click', () => selectLoc(row));
+        container.appendChild(row);
+      });
+    })();
 
-        // ── Location selection ───────────────────────────────────────
-        function selectLocation(el) {
-            document.querySelectorAll('.loc-row').forEach(o => o.classList.remove('selected'));
-            el.classList.add('selected');
-            selectedLocBonus = parseInt(el.dataset.locBonus);
-            selectedLocLabel = el.dataset.locLabel;
-            selectedLocEco   = el.dataset.eco !== 'false';
+    // ── State ─────────────────────────────────────────────────
+    let selNombre = null, selLocLabel = null, selEco = null;
+    let selDays = null, selOp = null;
 
-            const noEco   = !selectedLocEco;
-            const notice  = document.getElementById('no-eco-notice');
-            notice.classList.toggle('visible', noEco);
-
-            // Reset date when location changes
-            if (noEco) {
-                selectedDays = null; selectedDatePts = null;
-            }
-
-            // Rebuild date cards
-            buildDateCards();
-
-            // Re-attach selected date if still valid
-            if (!noEco && selectedDays !== null) {
-                document.querySelectorAll('.date-opt').forEach(o => {
-                    if (parseInt(o.dataset.days) === selectedDays) o.classList.add('selected');
-                });
-            }
-
-            // Update live bar
-            const locEl = document.getElementById('pli-loc');
-            locEl.textContent = noEco ? '0 pts' : '+' + selectedLocBonus + ' pts';
-            locEl.classList.toggle('active', !noEco);
-
-            if (noEco) {
-                document.getElementById('pli-date').textContent = '—';
-                document.getElementById('pli-date').classList.remove('active');
-            }
-            updateLiveTotal();
-        }
-
-        // ── Date selection ─────────────────────────────────────────
-        function selectDate(el) {
-            document.querySelectorAll('.date-opt').forEach(o => o.classList.remove('selected'));
-            el.classList.add('selected');
-            selectedDays    = parseInt(el.dataset.days);
-            selectedDatePts = parseInt(el.dataset.datePts);
-
-            const dateEl = document.getElementById('pli-date');
-            dateEl.textContent = '+' + selectedDatePts + ' pts';
-            dateEl.classList.add('active');
-            updateLiveTotal();
-        }
-
-        // ── Live total update ───────────────────────────────────────
-        function updateLiveTotal() {
-            const noEco     = selectedLocEco === false;
-            const bothReady = !noEco && selectedLocBonus !== null && selectedDays !== null;
-            const pltEl     = document.getElementById('plt-val');
-            const hint      = document.getElementById('eco-confirm-hint');
-            const btn       = document.getElementById('btn-confirm');
-
-            if (noEco) {
-                pltEl.textContent = '0 pts';
-                pltEl.classList.remove('has-value');
-                hint.textContent = 'Esta ubicación no genera EcoPoints. Selecciona otro punto.';
-                hint.classList.remove('ready');
-                btn.disabled = true;
-            } else if (bothReady) {
-                const total = selectedDatePts + selectedLocBonus;
-                pltEl.textContent = '+' + total + ' pts';
-                pltEl.classList.add('has-value');
-                pltEl.classList.add('bump');
-                setTimeout(() => pltEl.classList.remove('bump'), 300);
-                btn.disabled = false;
-                hint.textContent = '¡Listo! Pulsa Confirmar para activar EnvíoEco';
-                hint.classList.add('ready');
-            } else if (selectedLocBonus !== null) {
-                pltEl.textContent = '—';
-                pltEl.classList.remove('has-value');
-                hint.textContent = 'Ahora selecciona una fecha de entrega';
-                hint.classList.remove('ready');
-                btn.disabled = true;
-            } else {
-                pltEl.textContent = '—';
-                pltEl.classList.remove('has-value');
-                hint.textContent = 'Selecciona un punto de recogida y una fecha';
-                hint.classList.remove('ready');
-                btn.disabled = true;
-            }
-        }
-
-        // ── Confirm ────────────────────────────────────────────────
-        function confirmEco() {
-            const totalPts    = selectedDatePts + selectedLocBonus;
-            const newDate     = new Date(baseDelivery);
-            newDate.setDate(newDate.getDate() + selectedDays);
-            const dateStrLong = fmtLong(newDate);
-
-            // Lock UI
-            document.querySelectorAll('.loc-row, .date-opt').forEach(o => {
-                o.style.pointerEvents = 'none';
-                o.style.opacity = '.5';
-            });
-            document.querySelectorAll('.loc-row.selected, .date-opt.selected').forEach(o => o.style.opacity = '1');
-            document.getElementById('radius-slider').disabled = true;
-            document.getElementById('btn-confirm').style.display = 'none';
-            document.getElementById('eco-confirm-hint').style.display = 'none';
-
-            // Show activation message
-            document.getElementById('activated-date').textContent      = dateStrLong;
-            document.getElementById('activated-loc-label').textContent = selectedLocLabel;
-            document.getElementById('activated-pts').textContent       = `+${totalPts} 🍃 pts`;
-            document.getElementById('eco-activated').classList.add('visible');
-
-            // Update shipment card
-            const badge    = document.getElementById('badge-servicio');
-            const nota     = document.getElementById('nota');
-            const estadoEl = document.getElementById('estado');
-            if (badge)    { badge.textContent = 'Servicio: EnvíoEco ♻'; badge.style.background = '#d9f7be'; badge.style.color = '#135200'; }
-            if (estadoEl) estadoEl.textContent = 'En tránsito (modo ecológico)';
-            if (nota)     nota.innerHTML = `Has activado <strong>EnvíoEco</strong> con entrega en <strong>${selectedLocLabel}</strong> el <strong>${dateStrLong}</strong>. Ganarás <strong>+${totalPts} EcoPoints</strong> al completarse la entrega.`;
-
-            if (window.__updateImpactBar) window.__updateImpactBar();
-
-            btnEcoBtn.textContent   = '✅ EnvíoEco activado';
-            btnEcoBtn.disabled      = true;
-            btnEcoBtn.style.opacity = '.7';
-            btnEcoBtn.style.cursor  = 'default';
-        }
-    </script>
-
-</body>
-
-</html>
-<script>
-    // Coordenadas de ejemplo (Madrid)
-    const lat = 40.4168;
-    const lng = -3.7038;
-
-    // Crear mapa
-    const map = L.map('map').setView([lat, lng], 12);
-
-    // Cargar mapa base
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 19,
-        attribution: '© OpenStreetMap'
-    }).addTo(map);
-
-    // Marcador
-    L.marker([lat, lng])
-        .addTo(map)
-        .bindPopup("Ubicación aproximada del envío.")
-        .openPopup();
-
-  // ====== Configuración de la barra de impacto ======
-  // Rango máximo visible en la barra (kg CO2e)
-  const CO2_MAX = 10;
-
-  // Valores iniciales (puedes sustituir por datos reales)
-  let co2Actual = 4.8;   // kg CO2e en modo Estándar
-  const ahorroPorc = 40; // % ahorro al pasar a ECO
-
-  // Elementos del DOM
-  const bar        = document.querySelector('.impact-bar');
-  const barFill    = document.getElementById('impact-fill');
-  const co2ValueEl = document.getElementById('co2-value');
-  const savingEl   = document.getElementById('saving-percent');
-  const noteEl     = document.getElementById('impact-note');
-  const btnEco     = document.getElementById('btn-eco');
-
-  // Inicializa textos
-  savingEl.textContent = ahorroPorc.toString();
-
-  // Función para animar número (ej. 4.8 -> 2.9)
-  function animateNumber(el, from, to, duration = 600) {
-    const start = performance.now();
-    function tick(now) {
-      const p = Math.min(1, (now - start) / duration);
-      const value = from + (to - from) * p;
-      el.textContent = value.toFixed(1);
-      if (p < 1) requestAnimationFrame(tick);
-    }
-    requestAnimationFrame(tick);
-  }
-
-  // Función para actualizar barra y accesibilidad
-  function updateBar(valueKg) {
-    const pct = Math.max(0, Math.min(100, (valueKg / CO2_MAX) * 100));
-    barFill.style.width = pct + '%';
-    bar.setAttribute('aria-valuenow', valueKg.toFixed(1));
-  }
-
-  // Estado inicial
-  co2ValueEl.textContent = co2Actual.toFixed(1);
-  updateBar(co2Actual);
-
-  // Al pulsar "Cambiar a EnvíoEco" — sincroniza la barra de impacto
-  const btnEco2 = document.getElementById('btn-eco');
-  if (btnEco2) {
-    btnEco2.addEventListener('click', () => {
-      // La barra se actualiza cuando el usuario confirma (ver confirmEco())
+    // ── Panel toggle ──────────────────────────────────────────
+    document.getElementById('btn-eco').addEventListener('click', function () {
+      if (this.disabled) return;
+      const panel = document.getElementById('eco-panel');
+      panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
     });
-  }
 
-  // Función auxiliar expuesta para que confirmEco() actualice la barra
-  window.__updateImpactBar = function() {
-      if (!selectedDays) return;
-      const savingPct = Math.min(40 + (selectedDays - 2) * 2, 55);
-      const nuevoValor = +(co2Actual * (1 - savingPct / 100)).toFixed(1);
+    // ── Radius ────────────────────────────────────────────────
+    function onRadiusChange(slider) {
+      const km = parseFloat(slider.value);
+      slider.style.setProperty('--pct', ((km-1)/9*100)+'%');
+      document.getElementById('radius-val').textContent = km%1===0 ? km+' km' : km.toFixed(1)+' km';
+      document.querySelectorAll('.loc-row').forEach(row => {
+        const dist = parseFloat(row.dataset.dist||0);
+        const inRange = dist === 0 || dist <= km;
+        row.classList.toggle('out-of-range', !inRange);
+        if (!inRange && row.classList.contains('selected')) resetSel();
+      });
+    }
+    (function(){
+      const s = document.getElementById('radius-slider');
+      s.style.setProperty('--pct', ((parseFloat(s.value)-1)/9*100)+'%');
+      onRadiusChange(s);
+    })();
+
+    // ── Location ──────────────────────────────────────────────
+    function selectLoc(el) {
+      document.querySelectorAll('.loc-row').forEach(o => o.classList.remove('selected'));
+      el.classList.add('selected');
+      selEco      = el.dataset.eco !== 'false';
+      selLocLabel = el.dataset.locLabel;
+      selNombre   = el.dataset.nombre || null;
+      selDays = null; selOp = null;
+
+      document.getElementById('no-eco-notice').classList.toggle('visible', !selEco);
+      document.getElementById('pts-breakdown').classList.remove('visible');
+      document.getElementById('co2-chip').classList.remove('visible');
+      document.getElementById('pli-loc').textContent = '—';
+      document.getElementById('pli-loc').classList.remove('active');
+      document.getElementById('pli-date').textContent = '—';
+      document.getElementById('pli-date').classList.remove('active');
+
+      buildDateCards();
+      updateLiveBar();
+    }
+
+    // ── Date cards ────────────────────────────────────────────
+    function buildDateCards() {
+      const container = document.getElementById('date-options');
+      container.innerHTML = '';
+      container.classList.toggle('disabled', !selEco);
+      if (!selEco || !selNombre) return;
+
+      const opcionesPunto = R.fechasPorUbicacion[selNombre] || [];
+      const maxPts = Math.max(...opcionesPunto.map(o => o.pts));
+
+      opcionesPunto.forEach(op => {
+        const isBest = op.pts === maxPts;
+        const div = document.createElement('div');
+        div.className = 'date-opt' + (isBest ? ' best-combo' : '');
+        div.innerHTML = `
+          ${isBest ? '<span class="best-tag">⭐ Máximo</span>' : ''}
+          <div class="dopt-day">${op.fecha.split(' ')[0]}</div>
+          <div class="dopt-date">${op.fecha.split(' ').slice(1).join(' ')}</div>
+          <div class="dopt-delay">+${op.diasRetraso} día${op.diasRetraso>1?'s':''}</div>
+          <span class="dopt-pts">+${op.pts} pts</span>
+          <span class="dopt-co2">📦 ${op.paquetesAgrupados} paquetes agrupados</span>
+        `;
+        div.addEventListener('click', () => selectDate(div, op));
+        container.appendChild(div);
+      });
+    }
+
+    // ── Date select ───────────────────────────────────────────
+    function selectDate(el, op) {
+      document.querySelectorAll('.date-opt').forEach(o => o.classList.remove('selected'));
+      el.classList.add('selected');
+      selDays = op.diasRetraso; selOp = op;
+
+      // Desglose nuevo: ahorroNeto = ahorroBrutoGasolina - costoAlmacenaje
+      document.getElementById('bd-gasolina').textContent   = '+'+op.ahorroBrutoGasolina.toFixed(2)+'€';
+      document.getElementById('bd-dias-label').textContent = op.diasRetraso;
+      document.getElementById('bd-almacenaje').textContent = '−'+(op.costoAlmacenaje).toFixed(2)+'€';
+      document.getElementById('bd-neto').textContent       = op.ahorroNeto.toFixed(2)+'€';
+      document.getElementById('bd-formula').textContent    = 'round('+op.ahorroNeto.toFixed(2)+'×0.5÷0.10)';
+      document.getElementById('bd-total').textContent      = '+'+op.pts+' pts';
+      document.getElementById('pts-breakdown').classList.add('visible');
+
+      // CO2 chip → ahora muestra paquetes agrupados y ahorro neto
+      document.getElementById('co2-chip-text').textContent =
+        `${op.paquetesAgrupados} paquetes agrupados · DHL ahorra ${op.ahorroNeto.toFixed(2)}€ netos`;
+      document.getElementById('co2-chip').classList.add('visible');
+
+      // Barra live: toda la ganancia viene del ahorro neto, no hay split loc/fecha
+      // Mostramos ahorroBruto en "ubicación" y costoAlmacenaje en "fecha" como contexto
+      const pliLoc  = document.getElementById('pli-loc');
+      const pliDate = document.getElementById('pli-date');
+      pliLoc.textContent  = '+'+op.ahorroBrutoGasolina.toFixed(2)+'€ bruto'; pliLoc.classList.add('active');
+      pliDate.textContent = '−'+op.costoAlmacenaje.toFixed(2)+'€ almac.';    pliDate.classList.add('active');
+
+      updateLiveBar();
+    }
+
+    // ── Live bar ──────────────────────────────────────────────
+    function updateLiveBar() {
+      const pltEl = document.getElementById('plt-val');
+      const hint  = document.getElementById('eco-confirm-hint');
+      const btn   = document.getElementById('btn-confirm');
+
+      if (!selEco) {
+        pltEl.textContent='0 pts'; pltEl.classList.remove('has-value');
+        hint.textContent='Esta ubicación no genera EcoPoints. Selecciona otro punto.';
+        hint.classList.remove('ready'); btn.disabled=true;
+      } else if (selOp) {
+        pltEl.textContent='+'+selOp.pts+' pts';
+        pltEl.classList.add('has-value','bump');
+        setTimeout(()=>pltEl.classList.remove('bump'),300);
+        btn.disabled=false;
+        hint.textContent='¡Listo! Pulsa Confirmar para activar EnvíoEco';
+        hint.classList.add('ready');
+      } else if (selNombre) {
+        pltEl.textContent='—'; pltEl.classList.remove('has-value');
+        hint.textContent='Ahora selecciona una fecha de entrega';
+        hint.classList.remove('ready'); btn.disabled=true;
+      } else {
+        pltEl.textContent='—'; pltEl.classList.remove('has-value');
+        hint.textContent='Selecciona un punto de recogida y una fecha';
+        hint.classList.remove('ready'); btn.disabled=true;
+      }
+    }
+
+    function resetSel() {
+      selNombre=null; selLocLabel=null; selEco=null; selDays=null; selOp=null;
+      ['pli-loc','pli-date'].forEach(id=>{
+        document.getElementById(id).textContent='—';
+        document.getElementById(id).classList.remove('active');
+      });
+      document.getElementById('no-eco-notice').classList.remove('visible');
+      document.getElementById('pts-breakdown').classList.remove('visible');
+      document.getElementById('co2-chip').classList.remove('visible');
+      document.getElementById('date-options').innerHTML='';
+      updateLiveBar();
+    }
+
+    // ── Confirm ───────────────────────────────────────────────
+    function confirmEco() {
+      document.querySelectorAll('.loc-row,.date-opt').forEach(o=>{
+        o.style.pointerEvents='none'; o.style.opacity='.5';
+      });
+      document.querySelectorAll('.loc-row.selected,.date-opt.selected').forEach(o=>o.style.opacity='1');
+      document.getElementById('radius-slider').disabled=true;
+      document.getElementById('btn-confirm').style.display='none';
+      document.getElementById('eco-confirm-hint').style.display='none';
+
+      document.getElementById('activated-date').textContent      = selOp.fecha;
+      document.getElementById('activated-loc-label').textContent = selLocLabel;
+      document.getElementById('activated-pts').textContent       = `+${selOp.pts} 🍃 pts`;
+      document.getElementById('eco-activated').classList.add('visible');
+
+      const badge = document.getElementById('badge-servicio');
+      const nota  = document.getElementById('nota');
+      const estado= document.getElementById('estado');
+      if (badge)  { badge.textContent='Servicio: EnvíoEco ♻'; badge.style.background='#d9f7be'; badge.style.color='#135200'; }
+      if (estado) estado.textContent='En tránsito (modo ecológico)';
+      if (nota)   nota.innerHTML = `Has activado <strong>EnvíoEco</strong>. Entrega el <strong>${selOp.fecha}</strong> en <strong>${selLocLabel}</strong>. Ganarás <strong>+${selOp.pts} EcoPoints</strong> al agrupar <strong>${selOp.paquetesAgrupados} paquetes</strong> (ahorro neto DHL: ${selOp.ahorroNeto.toFixed(2)}€).`;
+
+      const btnEco = document.getElementById('btn-eco');
+      btnEco.textContent='✅ EnvíoEco activado'; btnEco.disabled=true;
+      btnEco.style.opacity='.7'; btnEco.style.cursor='default';
+
+      if (window.__updateImpactBar) window.__updateImpactBar();
+      renderDashboard();
+    }
+
+    // ── Dashboard ─────────────────────────────────────────────
+    function renderDashboard() {
+      const section = document.getElementById('dashboard-section');
+      section.style.display='block';
+      section.scrollIntoView({behavior:'smooth', block:'start'});
+
+      document.getElementById('pedidos-tbody').innerHTML =
+        R.pedidosMuestra.map((p,i) => `
+          <tr>
+            <td>${i+1}</td>
+            <td><strong>${p.id}</strong></td>
+            <td>${p.destinatario}</td>
+            <td>${p.fecha}</td>
+            <td>${p.peso} kg</td>
+            <td>${p.co2} kg</td>
+            <td>${p.eco ? '<span class="eco-badge">✅ EnvíoEco</span>' : '<span class="std-badge">Estándar</span>'}</td>
+          </tr>`).join('');
+    }
+  </script>
+
+  <script>
+    // Mapa (Móstoles)
+    const map = L.map('map').setView([40.3228,-3.8654],13);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+      {maxZoom:19,attribution:'© OpenStreetMap'}).addTo(map);
+    L.marker([40.3228,-3.8654]).addTo(map)
+      .bindPopup("Ubicación aproximada del envío.").openPopup();
+
+    const pCoords = {
+      P1:[40.3228,-3.8645], P2:[40.3241,-3.8612],
+      P3:[40.3256,-3.8590], P4:[40.3190,-3.8701], P5:[40.4065,-3.6895]
+    };
+    const pNombres = {
+      P1:'📨 Correos', P2:'🎫 Lotterías', P3:'🛒 Supermercado Día',
+      P4:'💊 Farmacia Central', P5:'📦 Casillero DHL'
+    };
+    Object.entries(pCoords).forEach(([id,[lat,lng]])=>{
+      L.circleMarker([lat,lng],{radius:8,color:'#2e7d32',fillColor:'#4caf50',fillOpacity:.85})
+       .addTo(map).bindPopup(`<strong>${pNombres[id]}</strong>`);
+    });
+
+    // Barra CO2
+    const co2Actual = 4.8;
+    const bar = document.querySelector('.impact-bar');
+    const barFill = document.getElementById('impact-fill');
+    const co2El   = document.getElementById('co2-value');
+    const noteEl  = document.getElementById('impact-note');
+
+    function animN(el,from,to,dur=600){
+      const t0=performance.now();
+      (function f(now){ const p=Math.min(1,(now-t0)/dur); el.textContent=(from+(to-from)*p).toFixed(1); if(p<1)requestAnimationFrame(f); })(performance.now());
+    }
+    function setBar(v){ barFill.style.width=Math.max(0,Math.min(100,v/10*100))+'%'; bar.setAttribute('aria-valuenow',v.toFixed(1)); }
+
+    co2El.textContent = co2Actual.toFixed(1); setBar(co2Actual);
+
+    window.__updateImpactBar = function(){
+      if (!selOp) return;
+      // La reducción de CO2 se estima proporcional al ahorro neto (consolidación de rutas)
+      const pct  = Math.min(20 + selOp.diasRetraso * 3, 50);
+      const nuevo = +(co2Actual*(1-pct/100)).toFixed(1);
       bar.classList.add('eco');
-      animateNumber(co2ValueEl, co2Actual, nuevoValor, 700);
-      updateBar(nuevoValor);
-      noteEl.innerHTML = 'Has activado <strong>EnvíoEco</strong>. Emisiones reducidas aproximadamente un ' + savingPct + '%.';
-  };
-</script>
+      animN(co2El, co2Actual, nuevo, 700);
+      setBar(nuevo);
+      noteEl.innerHTML = `Has activado <strong>EnvíoEco</strong>. Reducción estimada de emisiones: ~${pct}% gracias a la consolidación de <strong>${selOp.paquetesAgrupados} paquetes</strong> en una misma ruta.`;
+    };
+  </script>
+</body>
+</html>
